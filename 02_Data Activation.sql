@@ -1,6 +1,6 @@
 -- Databricks notebook source
 -- MAGIC %md
--- MAGIC # Hightouch to Google Ads
+-- MAGIC # Hightouch
 -- MAGIC 
 -- MAGIC Hightouch syncs your data in Databricks to the tools that your business teams rely on.
 -- MAGIC 

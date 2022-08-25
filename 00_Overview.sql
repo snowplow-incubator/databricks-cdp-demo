@@ -6,7 +6,7 @@
 -- MAGIC 
 -- MAGIC <img src="files/images/composable_cdp.png" width="80%">
 -- MAGIC 
--- MAGIC In these notebooks we will be exploring behavioural data collected by Snowplow's Javascript tracker from Snowplow's own [website](https://snowplowanalytics.com/). We will then model this data to make it analytics ready using dbt. The end goal will be to use this dataset to more effectivley target customers to book a demo with our platform using Hightouch to Google Ads.
+-- MAGIC In these notebooks we will be exploring behavioural data collected by Snowplow's Javascript tracker from Snowplow's own [website](https://snowplowanalytics.com/). We will then model this data to make it analytics ready using dbt. The end goal will be to use this dataset to more effectivley target customers to book a demo with Snowplow's platform using Hightouch to sync to 3rd party destinations like Google Ads.
 
 -- COMMAND ----------
 
