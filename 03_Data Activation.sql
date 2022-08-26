@@ -1,6 +1,6 @@
 -- Databricks notebook source
 -- MAGIC %md
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/move_media/assets/hightouch_logo.png" width="25%">
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_logo.png" width="25%">
 
 -- COMMAND ----------
 
@@ -13,11 +13,11 @@
 -- MAGIC 
 -- MAGIC We can easily connect to Hightouch from Databricks using [Partner Connect](https://dbc-dcab5385-51e3.cloud.databricks.com/partnerconnect?o=2894723222787945):
 -- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/move_media/assets/hightouch_partner_connect.png" width="27%">
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_partner_connect.png" width="27%">
 -- MAGIC 
 -- MAGIC Once setup we can see our Databricks cluster in the [Sources](https://app.hightouch.com/snowplow-yzw4c/sources) tab in Hightouch:
 -- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/move_media/assets/hightouch_sources.png" width="30%">
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_sources.png" width="30%">
 
 -- COMMAND ----------
 
@@ -38,7 +38,7 @@
 -- MAGIC - Lower engagement (less than 60 secs engaged)
 -- MAGIC - Landed on the Snowplow homepage
 -- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/move_media/assets/hightouch_awareness_users_audience_builder.png" width="50%">
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_awareness_users_audience_builder.png" width="50%">
 
 -- COMMAND ----------
 
@@ -62,11 +62,11 @@
 -- MAGIC 
 -- MAGIC After creating the event (see set up [here](https://app.hightouch.com/snowplow-yzw4c/audiences/setup/events/591234)), we need to add a direct relationship between this and our *All Users* parent model.
 -- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/move_media/assets/hightouch_direct_relationship.png" width="50%">
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_direct_relationship.png" width="50%">
 -- MAGIC 
 -- MAGIC We can now use this event as a filter when we build our Engagement Users audience:
 -- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/move_media/assets/hightouch_engagement_users_audience_builder.png" width="50%">
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_engagement_users_audience_builder.png" width="50%">
 
 -- COMMAND ----------
 
@@ -75,7 +75,7 @@
 -- MAGIC 
 -- MAGIC After setting up Braze as a [destination](https://app.hightouch.com/snowplow-yzw4c/destinations) in Hightouch, we can sync up our new audiences. In this case we want to sync these audiences to our *Awareness Users* and *Engagement Users* Braze subscription groups.
 -- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/move_media/assets/hightouch_configure_braze.png" width="40%">
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_configure_braze.png" width="40%">
 
 -- COMMAND ----------
 
@@ -85,7 +85,7 @@
 -- MAGIC 
 -- MAGIC We can ensure this by using the [dbt Cloud extension](https://app.hightouch.com/snowplow-yzw4c/extensions) to trigger syncs after the dbt Snowplow web model job finishes and our Gold tables are updated.
 -- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/move_media/assets/hightouch_dbt_schedule.png" width="40%">
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_dbt_schedule.png" width="40%">
 
 -- COMMAND ----------
 
@@ -94,6 +94,6 @@
 -- MAGIC 
 -- MAGIC We have now finished creating our audiences and have them synced up to Braze!
 -- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/move_media/assets/hightouch_syncs_braze.png" width="60%">
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_syncs_braze.png" width="60%">
 -- MAGIC 
 -- MAGIC Hightouch is now setup with all the data and events from Databricks to enable our teams to easily build new audiences based on Snowplow's rich behavioural data and sync to their needed destinations.
