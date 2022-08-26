@@ -1,10 +1,13 @@
 -- Databricks notebook source
 -- MAGIC %md
--- MAGIC # Snowplow web behavioural data
+-- MAGIC <img src="files/images/databricks_logo.png" width="30%">
+
+-- COMMAND ----------
+
+-- MAGIC %md
+-- MAGIC # Data Storage & Modeling
 -- MAGIC 
--- MAGIC To get the most from advanced analytics and AI, you need rich, contextual data of the best quality. Snowplow can help you create granular behavioral data in your own Databricks lakehouse.
--- MAGIC 
--- MAGIC In this notebook we will be exploring behavioural data collected by Snowplow's Javascript tracker from Snowplow's own [website](https://snowplowanalytics.com/).
+-- MAGIC In this notebook we will be modeling and exploring behavioural data collected by Snowplow's Javascript tracker from Snowplow's own [website](https://snowplowanalytics.com/) in Databricks.
 
 -- COMMAND ----------
 
@@ -12,8 +15,6 @@
 -- MAGIC ## Atomic Events Table (Bronze)
 -- MAGIC 
 -- MAGIC All events are loaded using Snowplow's RDB loader into a single atomic events table backed by Databricks’ Delta tables. We call this a “Wide-row Table” – with one row per event, and one column for each type of entity/property and self-describing event.
--- MAGIC 
--- MAGIC [Go into more detail of how the data is loaded into Databricks. Snowplow pipeline diagram?]
 
 -- COMMAND ----------
 
@@ -25,32 +26,52 @@ limit 10
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC For example we can query this table to examine users who are clicking the 'LOG IN' button on the site along with the page they're on, what device are they using, where in the world they are etc.
+-- MAGIC ### Querying the Atomic Events Bronze Table
+-- MAGIC Snowplow loads event contexts and unstructured events as arrays or objects in the delta table. Two examples are:
+-- MAGIC - User agent parser context 
+-- MAGIC   - This enrichment uses the ua-parser library to parse the user agent and provide information about the user’s device
+-- MAGIC - Link click unstructed event
+-- MAGIC   - Each link click event captures the link’s href attribute. The event also has fields for the link’s id, classes, and target (where the linked document is opened, such as a new tab or new window)
+
+-- COMMAND ----------
+
+select
+  contexts_com_snowplowanalytics_snowplow_ua_parser_context_1,
+  unstruct_event_com_snowplowanalytics_snowplow_link_click_1
+from snowplow.events
+where
+  unstruct_event_com_snowplowanalytics_snowplow_link_click_1.target_url is not null
+limit 10
+
+-- COMMAND ----------
+
+-- MAGIC %md
+-- MAGIC Say a data analyst wanted to understand which devices and browsers users are logging into Snowplow's console, they can unnest the user agent context and link click columns to run the following query:
 
 -- COMMAND ----------
 
 -- DBTITLE 1,Examine Log In Events
 select 
-  domain_userid,
-  event_name, 
-  collector_tstamp,
-  page_urlpath, 
-  geo_country,
-  geo_city,
   contexts_com_snowplowanalytics_snowplow_ua_parser_context_1.device_family[0] as device_family,
-  contexts_com_snowplowanalytics_snowplow_ua_parser_context_1.useragent_family[0] as browser_family
+  contexts_com_snowplowanalytics_snowplow_ua_parser_context_1.useragent_family[0] as browser_family,
+  count(distinct domain_sessionid) as number_of_sessions
 from snowplow.events
 where
   unstruct_event_com_snowplowanalytics_snowplow_link_click_1.target_url = 'https://console.snowplowanalytics.com/'
   and collector_tstamp_date >= date_sub(current_date(), 7) 
-limit 100
+  and app_id = 'website'
+group by 1,2
+order by 3 desc
+limit 10
 
 -- COMMAND ----------
 
 -- MAGIC %md
 -- MAGIC ## Create derived tables using dbt (Gold - Analytics Ready)
 -- MAGIC 
--- MAGIC Use Snowplow's dbt web package to transform and aggregate the raw web data into a set of derived tables straight out of the box:
+-- MAGIC From the query above we can see it is not easy for someone who doesn't know the atomic events table well to get the answers they need from the data. Querying the atomic events table also requires more compute so ends up being more expensive. We need to flatten these columns and aggregate the events into useful, analytics ready tables.
+-- MAGIC 
+-- MAGIC To do this we can use Snowplow's dbt web package to transform and aggregate the raw web data into a set of derived **Gold** tables straight out of the box:
 -- MAGIC * `page_views`
 -- MAGIC * `sessions`
 -- MAGIC * `users`
@@ -60,10 +81,9 @@ limit 100
 -- MAGIC <img src="files/images/snowplow_web_model_dag.jpg" width="40%">
 -- MAGIC 
 -- MAGIC ### dbt Cloud using Partner Connect
--- MAGIC Easy setup yout dbt Cloud connection using Databricks' [Partner Connect](https://dbc-dcab5385-51e3.cloud.databricks.com/partnerconnect?o=2894723222787945).
+-- MAGIC Easily setup yout dbt Cloud connection using Databricks' [Partner Connect](https://dbc-dcab5385-51e3.cloud.databricks.com/partnerconnect?o=2894723222787945).
 -- MAGIC 
 -- MAGIC ### Installing the snowplow_web dbt package
--- MAGIC 
 -- MAGIC To include the package in your dbt project, include the following in your `packages.yml` file:
 -- MAGIC 
 -- MAGIC ```yaml
@@ -78,6 +98,7 @@ limit 100
 
 -- COMMAND ----------
 
+-- DBTITLE 1,dbt Cloud
 -- MAGIC %py
 -- MAGIC slide_id = '1BZZhR_QyU8DhF4q_rEZo7tcgK1DGpvTWocdoEGwgp_0'
 -- MAGIC slide_number = 'id.p1'
@@ -111,7 +132,7 @@ select * from dbt_cloud_derived.snowplow_web_users where start_tstamp_date >= da
 -- MAGIC %md
 -- MAGIC ## Data Exploration
 -- MAGIC 
--- MAGIC First we look at what are the top blog posts on the website, which are most read and have the highest engagement. Also see which posts were a users first page and if any of those users returned for another session on the site. This analysis can be fed back to the content writers to review so future blog posts can be optimised to boost engagement. 
+-- MAGIC First we look at what are the top blog posts on the website, which are most read and have the highest engagement. This analysis can be fed back to the content writers to review so future blog posts can be optimised to boost engagement. 
 
 -- COMMAND ----------
 
@@ -206,11 +227,3 @@ limit 20
 -- MAGIC See DBSQL [Snowplow Website Insights](https://dbc-dcab5385-51e3.cloud.databricks.com/sql/dashboards/d98ec601-48c1-4f28-a06e-b8c75e118147-snowplow-website-insights?o=2894723222787945) dashboard to view some web analytics.
 -- MAGIC 
 -- MAGIC <img src="files/images/dashboard_screenshot_1.png" width="70%">
--- MAGIC 
--- MAGIC [provide more intresting insights in the dashboard]
-
--- COMMAND ----------
-
--- MAGIC %md
--- MAGIC ## Next step:
--- MAGIC Implement propoensity modeling with machine learning 
