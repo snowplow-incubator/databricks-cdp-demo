@@ -1,5 +1,10 @@
 -- Databricks notebook source
 -- MAGIC %md
+-- MAGIC <img src="files/images/hightouch_logo.png" width="25%">
+
+-- COMMAND ----------
+
+-- MAGIC %md
 -- MAGIC # Data Activation using Hightouch
 -- MAGIC 
 -- MAGIC Hightouch syncs your data in Databricks to the tools that your business teams rely on.
@@ -70,7 +75,7 @@
 -- MAGIC 
 -- MAGIC After setting up Braze as a [destination](https://app.hightouch.com/snowplow-yzw4c/destinations) in Hightouch, we can sync up our new audiences. In this case we want to sync these audiences to our *Awareness Users* and *Engagement Users* Braze subscription groups.
 -- MAGIC 
--- MAGIC <img src="files/images/hightouch_configure_braze.png" width="50%">
+-- MAGIC <img src="files/images/hightouch_configure_braze.png" width="40%">
 
 -- COMMAND ----------
 
@@ -80,7 +85,7 @@
 -- MAGIC 
 -- MAGIC We can ensure this by using the [dbt Cloud extension](https://app.hightouch.com/snowplow-yzw4c/extensions) to trigger syncs after the dbt Snowplow web model job finishes and our Gold tables are updated.
 -- MAGIC 
--- MAGIC <img src="files/images/hightouch_dbt_schedule.png" width="35%">
+-- MAGIC <img src="files/images/hightouch_dbt_schedule.png" width="40%">
 
 -- COMMAND ----------
 

@@ -1,10 +1,13 @@
 -- Databricks notebook source
 -- MAGIC %md
--- MAGIC # Snowplow web behavioural data
+-- MAGIC <img src="files/images/databricks_logo.png" width="30%">
+
+-- COMMAND ----------
+
+-- MAGIC %md
+-- MAGIC # Data Storage & Modeling
 -- MAGIC 
--- MAGIC To get the most from advanced analytics and AI, you need rich, contextual data of the best quality. Snowplow can help you create granular behavioral data in your own Databricks lakehouse.
--- MAGIC 
--- MAGIC In this notebook we will be modeling and exploring behavioural data collected by Snowplow's Javascript tracker from Snowplow's own [website](https://snowplowanalytics.com/).
+-- MAGIC In this notebook we will be modeling and exploring behavioural data collected by Snowplow's Javascript tracker from Snowplow's own [website](https://snowplowanalytics.com/) in Databricks.
 
 -- COMMAND ----------
 
@@ -43,7 +46,7 @@ limit 10
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC Say a data analyst wanted to understand which devices and browsers people are logging into Snowplow's console, they can unnest the user agent context and link click columns to run the following query:
+-- MAGIC Say a data analyst wanted to understand which devices and browsers users are logging into Snowplow's console, they can unnest the user agent context and link click columns to run the following query:
 
 -- COMMAND ----------
 
@@ -224,9 +227,3 @@ limit 20
 -- MAGIC See DBSQL [Snowplow Website Insights](https://dbc-dcab5385-51e3.cloud.databricks.com/sql/dashboards/d98ec601-48c1-4f28-a06e-b8c75e118147-snowplow-website-insights?o=2894723222787945) dashboard to view some web analytics.
 -- MAGIC 
 -- MAGIC <img src="files/images/dashboard_screenshot_1.png" width="70%">
-
--- COMMAND ----------
-
--- MAGIC %md
--- MAGIC ## Next step:
--- MAGIC Implement propoensity modeling with machine learning 
