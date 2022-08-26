@@ -78,7 +78,7 @@ limit 10
 -- MAGIC 
 -- MAGIC The package processes all web events incrementally. It is not just constrained to page view events - any custom events you are tracking can also be incrementally processed. 
 -- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/move_media/assets/snowplow_web_model_dag.jpg" width="40%">
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/move_media/assets/snowplow_web_model_dag.png" width="40%">
 -- MAGIC 
 -- MAGIC ### dbt Cloud using Partner Connect
 -- MAGIC Easily setup yout dbt Cloud connection using Databricks' [Partner Connect](https://dbc-dcab5385-51e3.cloud.databricks.com/partnerconnect?o=2894723222787945).
