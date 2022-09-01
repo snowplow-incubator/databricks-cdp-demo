@@ -2,8 +2,16 @@
 -- MAGIC %md
 -- MAGIC # Introduction
 -- MAGIC 
--- MAGIC Adpoting a composable CDP means best-in-class products at each stage in the pipeline, from data creation to storage, modeling and activation.
+-- MAGIC The definition of Customer Data Platforms has evolved numerous times since their inception in 2013. Gartner currently defines CDPs as "software application that supports marketing and customer experience use cases by unifying a company's customer data from marketing and other channels. CDPs optimize the timing and targeting of messages, offers and customer engagement activities, and enable the analysis of individual-level customer behavior over time."
 -- MAGIC 
+-- MAGIC The components of standard CDP offerings can be classified into the following categories:
+-- MAGIC 
+-- MAGIC 
+-- MAGIC - **Data Collection** : CDPs are designed to collect customer events from a number of different sources (onsite, mobile applications and server-side) and append these activities to the customer profile. These events typically contain metadata to provide detailed context about the customer's specific digital interactions. Event collection is typically designed to support marketing use cases such as marketing automation.
+-- MAGIC 
+-- MAGIC - **Data Storage and Modeling**: CDPs provide a proprietary repository of data that aggregates and manages different sources of customer data collected from most of the business's SaaS and internal applications. The unified database is a 360 degree view about each customer and a central source of truth for the business. Most CDPs have out-of-the-box identity stitching functionality and tools to create custom traits on user profiles.
+-- MAGIC 
+-- MAGIC - **Data Activation**: CDPs offer the ability to build audience segments leveraging the data available in the platform. Thanks to a wide-array of pre-built integrations, these audiences and other customer data points are then able to be pushed both to and from various marketing channels.
 -- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/composable_cdp.png" width="80%">
 -- MAGIC 
 -- MAGIC In these notebooks we will be exploring behavioural data collected by Snowplow's Javascript tracker from Snowplow's own [website](https://snowplowanalytics.com/) stored in Databricks. We will then model this data to make it analytics ready using dbt. This dataset can then be used to more effectivley target customers using Hightouch to sync to 3rd party destinations.
@@ -11,5 +19,5 @@
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC In this demo we show how we can build user segments based on a user's web beavioural data and sync these to Braze email subscription groups.
+-- MAGIC In this Accelerator we show how we can build user segments based on a user's web beavioural data and sync these to Braze email subscription groups.
 -- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_syncs_braze.png" width="50%">
