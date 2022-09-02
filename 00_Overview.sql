@@ -14,7 +14,7 @@
 -- MAGIC - **Data Activation**: CDPs offer the ability to build audience segments leveraging the data available in the platform. Thanks to a wide-array of pre-built integrations, these audiences and other customer data points are then able to be pushed both to and from various marketing channels.
 -- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/composable_cdp.png" width="80%">
 -- MAGIC 
--- MAGIC In these notebooks we will be exploring behavioural data collected by Snowplow's Javascript tracker from Snowplow's own [website](https://snowplowanalytics.com/) stored in Databricks. We will then model this data to make it analytics ready using dbt. This dataset can then be used to more effectivley target customers using Hightouch to sync to 3rd party destinations.
+-- MAGIC In these notebooks we will be exploring behavioural data collected by Snowplow's Javascript tracker from Snowplow's [snowplow.io](https://snowplow.io/) website stored in Databricks. We will then model this data to make it analytics ready using dbt. This dataset can then be used to more effectivley target customers using Hightouch to sync to 3rd party destinations.
 
 -- COMMAND ----------
 

@@ -7,7 +7,7 @@
 -- MAGIC %md
 -- MAGIC # Data Storage & Modeling
 -- MAGIC 
--- MAGIC In this notebook we will be modeling and exploring behavioural data collected by Snowplow's Javascript tracker from Snowplow's own [website](https://snowplowanalytics.com/) in Databricks.
+-- MAGIC In this notebook we will be modeling and exploring behavioural data collected by Snowplow's Javascript tracker from Snowplow's [snowplow.io](https://snowplow.io/) website in Databricks.
 
 -- COMMAND ----------
 
@@ -155,7 +155,7 @@ limit 10
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC We can also explore which users are most engaged with the website and have the most potential to convert into Snowplow customers. We can see how many times they have visited, first and last pages viewed and where they came from. If they have viewed any of the '[get-started](https://snowplowanalytics.com/get-started/)' pages where they can book a demo or go onto try Snowplow, we can flag this as them having intent to convert. These users may have a higher chance of converting to a Snowplow customer so it makes sense to target these users when running ad campaigns.
+-- MAGIC We can also explore which users are most engaged with the website and have the most potential to convert into Snowplow customers. We can see how many times they have visited, first and last pages viewed and where they came from. If they have viewed any of the '[get-started](https://snowplow.io/get-started/)' pages where they can book a demo or go onto try Snowplow, we can flag this as them having intent to convert. These users may have a higher chance of converting to a Snowplow customer so it makes sense to target these users when running ad campaigns.
 
 -- COMMAND ----------
 
@@ -227,3 +227,10 @@ limit 20
 -- MAGIC See DBSQL [Snowplow Website Insights](https://dbc-dcab5385-51e3.cloud.databricks.com/sql/dashboards/d98ec601-48c1-4f28-a06e-b8c75e118147-snowplow-website-insights?o=2894723222787945) dashboard to view some web analytics.
 -- MAGIC 
 -- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/dashboard_screenshot_1.png" width="70%">
+
+-- COMMAND ----------
+
+-- MAGIC %md
+-- MAGIC ## Next Step:
+-- MAGIC 
+-- MAGIC Implement a propensity to engage solution with machine learning so we can predict which users will fill out the demo request form.
