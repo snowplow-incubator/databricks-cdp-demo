@@ -5,7 +5,7 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/propensity_solution/assets/composable_cdp_architecture.png" width="80%">
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/composable_cdp_architecture.png" width="80%">
 
 # COMMAND ----------
 
@@ -60,14 +60,14 @@
 # MAGIC %md
 # MAGIC ### SHAP Analysis and Feature Importance of LightGBM Model:
 # MAGIC 
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/propensity_solution/assets/lgbm_shap_analysis.png" width="50%">
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/propensity_solution/assets/lgbm_feature_importance.png" width="30%">
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/lgbm_shap_analysis.png" width="50%">
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/lgbm_feature_importance.png" width="30%">
 # MAGIC 
 # MAGIC This shows the importance of the engagement metrics in predicting conversion and that engagement contributes to 25% of the overall model performance.
 # MAGIC 
 # MAGIC **Expainability is key:** example of trees from the pure LightGBM model
 # MAGIC 
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/propensity_solution/assets/lgbm_example_tree.png" width="100%">
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/lgbm_example_tree.png" width="100%">
 # MAGIC 
 # MAGIC From this tree you can see the top two features are by far the most important drivers to drive conversion. For our project the inflection points are:
 # MAGIC * **Engaged time** 15 seconds
