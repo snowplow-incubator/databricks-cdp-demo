@@ -1,8 +1,8 @@
 -- Databricks notebook source
 -- MAGIC %md
--- MAGIC # Introduction
+-- MAGIC # Introduction of Composable CDP platform
 -- MAGIC 
--- MAGIC The definition of Customer Data Platforms has evolved numerous times since their inception in 2013. Gartner currently defines CDPs as "software application that supports marketing and customer experience use cases by unifying a company's customer data from marketing and other channels. CDPs optimize the timing and targeting of messages, offers and customer engagement activities, and enable the analysis of individual-level customer behavior over time."
+-- MAGIC The definition of Customer Data Platforms has evolved numerous times since their inception in 2013. Gartner currently defines CDPs as "software application that supports marketing and customer experience use cases by unifying a company's customer data from marketing and other channels. CDPs optimize the timing and targeting of messages, offers and customer engagement activities, and enables the analysis of individual-level customer behavior over time."
 -- MAGIC 
 -- MAGIC The components of standard CDP offerings can be classified into the following categories:
 -- MAGIC 
@@ -12,12 +12,46 @@
 -- MAGIC - **Data Storage and Modeling**: CDPs provide a proprietary repository of data that aggregates and manages different sources of customer data collected from most of the business's SaaS and internal applications. The unified database is a 360 degree view about each customer and a central source of truth for the business. Most CDPs have out-of-the-box identity stitching functionality and tools to create custom traits on user profiles.
 -- MAGIC 
 -- MAGIC - **Data Activation**: CDPs offer the ability to build audience segments leveraging the data available in the platform. Thanks to a wide-array of pre-built integrations, these audiences and other customer data points are then able to be pushed both to and from various marketing channels.
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/composable_cdp.png" width="80%">
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/composable_cdp.png" width="60%">
 -- MAGIC 
 -- MAGIC In these notebooks we will be exploring behavioural data collected by Snowplow's Javascript tracker from Snowplow's [snowplow.io](https://snowplow.io/) website stored in Databricks. We will then model this data to make it analytics ready using dbt. This dataset can then be used to more effectivley target customers using Hightouch to sync to 3rd party destinations.
 
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC In this Accelerator we show how we can build user segments based on a user's web beavioural data and sync these to Braze email subscription groups.
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_syncs_braze.png" width="50%">
+-- MAGIC # Introduction to the Solution demo
+-- MAGIC 
+-- MAGIC This solution demonstrates the concept of Composable CDP by using the best-in-class tools for each step of the process. Snowplow platform for getting user behavioural data from your product (visitors), Databricks DeltaLake to store the data, Databricks and MLFlow for training and executing sophisticated ML predictions to determine a likelihood of conversion and Hightouch Activation platform to synchronize the cohort with highest propensity score with marketing tools Braze, Salesforce and Facebook Ads and accelerate their conversion into the qualified leads.
+-- MAGIC 
+-- MAGIC **Key facts about the demo set up:**
+-- MAGIC - behavioural data created represents visitors of a website from B2B SaaS company with a simple conversion action (ask for demo)
+-- MAGIC - The propensity scoring is based on the first touch of user in the product. 
+-- MAGIC - Creating 1 highly accurate ML Audience segment of visitors with very high propensity to convert
+-- MAGIC - Comparing the performance against one static Audienc segment created by Marketing person 
+-- MAGIC 
+-- MAGIC 
+-- MAGIC ----------------------------------------------------------------------------------------
+-- MAGIC Now, let's walk through the process of how this was enabled:
+-- MAGIC 
+-- MAGIC 
+-- MAGIC **Step 1.** Create of rich behavioural data from testing data product (website of B2B company)
+-- MAGIC 
+-- MAGIC **Step 2.** Apply enrichments features to enhance the data and select snowplow web dbt package
+-- MAGIC 
+-- MAGIC **Step 3.** Run out-of-the-box DBT web package to model the raw data into AI and BI ready consumption
+-- MAGIC 
+-- MAGIC **Step 4.** Select initial features to run the Propensity model and enrich the dataset with the Propensity score
+-- MAGIC 
+-- MAGIC **Step 5.** Via Audience builder, select the cohort with the highest propensity score and sync with Braze and SFMC
+-- MAGIC 
+-- MAGIC **Step 6.** Run personalised marketing campaigns for the selected cohort
+-- MAGIC 
+-- MAGIC **Step 7.** Measure the performance of the cohort and other web analytics performance indicators
+
+-- COMMAND ----------
+
+-- MAGIC %md
+-- MAGIC **Architecture diagram of the demo solution**
+-- MAGIC 
+-- MAGIC 
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/update_to_static_dataset/assets/composable_cdp_new.png" width="60%">

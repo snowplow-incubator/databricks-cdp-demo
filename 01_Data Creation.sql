@@ -1,20 +1,128 @@
 -- Databricks notebook source
 -- MAGIC %md
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_logo.png" width="50%">
+-- MAGIC # Data Creation with Snowplow
+-- MAGIC 
+-- MAGIC Snowplow Analytics is an open-source enterprise data creation platform that enables data collection from multiple products for advanced data analytics and AI/ML solutions. 
+-- MAGIC 
+-- MAGIC **Snowplow allows you to:** 
+-- MAGIC 
+-- MAGIC - Create a rich granular behavioural data across your digital platform
+-- MAGIC - Define your own version-controlled custom events and entity schema
+-- MAGIC - Enchrich the data with various services (pseudonymization, geo, currency exchange, campaign attribution...)
+-- MAGIC - Provides flexible identity stitching
+-- MAGIC - Control the quality of your data
+-- MAGIC - Own your data asset and infrastructure
+-- MAGIC 
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/update_to_static_dataset/assets/snowplow_BDP.png" width="40%">
+-- MAGIC 
+-- MAGIC 
+-- MAGIC Accurate and compliant identification of users is the cornerstone of any CDP. With first-party user identifiers included with each event and in-stream privacy tooling, including PII pseudonymization, you have a complete, and compliant view of every customer interaction.
+-- MAGIC 
+-- MAGIC Using Snowplow’s private deployment model and native connector to Databricks, your unified event stream lands in real-time in the Delta Lake.
+-- MAGIC 
+-- MAGIC 
+-- MAGIC **Sources:** 
+-- MAGIC - What is Snowplow Platform? https://snowplow.io/snowplow-bdp/
+-- MAGIC - What is Data Creation? https://snowplow.io/what-is-data-creation/
+-- MAGIC - What is behavioural data? https://snowplow.io/what-is-behavioral-data/
+-- MAGIC - Try Snowplow Platform: https://snowplow.io/get-started/
 
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC # Snowplow Behavioural Data Creation
+-- MAGIC # Data Creation demo
+
+-- COMMAND ----------
+
+-- MAGIC %md
 -- MAGIC 
--- MAGIC To get the most from advanced analytics and AI, you need rich, contextual data of the best quality. Snowplow can help you create granular behavioral data from across your digital platforms to build a true single customer view. 
+-- MAGIC So let's now dive into how the data created by Snowplow platform looks like, what are the main figures, number of events and unique users entering the demo website. 
+
+-- COMMAND ----------
+
+-- MAGIC %py
+-- MAGIC import plotly.express as px
 -- MAGIC 
--- MAGIC With Snowplow, data teams can define their own version-controlled custom events and entity schema, part of our Universal Data Language. Each event can also be enriched with an unlimited number of entities and properties creating data bespoke to your business and providing unlimited opportunities for activation.
+-- MAGIC df = spark.sql(
+-- MAGIC """
+-- MAGIC select date(collector_tstamp) as Date, count(distinct domain_userid) as users, count(*) as events
+-- MAGIC from snowplow_sample_data.events 
+-- MAGIC where app_id = 'website'
+-- MAGIC group by 1
+-- MAGIC order by 1
+-- MAGIC """
+-- MAGIC ).toPandas()
 -- MAGIC 
--- MAGIC \
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_data_catalog.png" width="60%">
--- MAGIC \
--- MAGIC \
--- MAGIC Accurate and compliant identification of users is the cornerstone of any CDP. With first-party user identifiers included with each event and in-stream privacy tooling, including PII pseudonymization, you have a complete, and compliant view of every customer interaction.
+-- MAGIC fig = px.bar(df, x="Date", y=["users", "events"], barmode='group',
+-- MAGIC              labels={"variable": "Count"},
+-- MAGIC              title='Unique Users and Events over Time')
+-- MAGIC fig.show()
+
+-- COMMAND ----------
+
+-- MAGIC %md
+-- MAGIC And now let's see how the atomic data looks like: 
 -- MAGIC 
--- MAGIC Using Snowplow’s private deployment model and native connector to Databricks, your unified event stream lands in real-time in the Delta Lake.
+-- MAGIC - all events, entities stitched from multiple sources into one simple table
+-- MAGIC - during enrichment the events have extra properties and values attached to them, also know as dimension widening.
+-- MAGIC 
+-- MAGIC **The following Enrichments write data into atomic.events table:**
+-- MAGIC 
+-- MAGIC - IP anonymization
+-- MAGIC - PII Pseudonymization
+-- MAGIC - IP lookups 
+-- MAGIC - Campaign attribution
+-- MAGIC - referer-parser enrichment
+-- MAGIC - IAB
+-- MAGIC 
+-- MAGIC 
+-- MAGIC **Sources:**
+-- MAGIC - The list of all available enchrichments: https://docs.snowplow.io/docs/enriching-your-data/available-enrichments/
+-- MAGIC - What is tracking event? https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/browser-tracker/browser-tracker-v3-reference/tracking-events
+-- MAGIC - How to set up a JavaScript tracker to my Web Product: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/javascript-tracker/web-quick-start-guide/
+-- MAGIC - How to set up a Mobile tracker for my MobileApp: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/mobile-trackers/installation-and-set-up/
+-- MAGIC - All additional supported tracking methods - https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/snowplow-tracker-protocol/
+
+-- COMMAND ----------
+
+-- DBTITLE 1,Atomic data created by Snowplow [BRONZE TABLE]
+select * from snowplow_sample_data.events 
+where app_id = 'website'
+limit 10
+
+-- COMMAND ----------
+
+-- MAGIC %md
+-- MAGIC Snowplow's data use **RECAP** framework to help customers create right data with the right quality:
+-- MAGIC 
+-- MAGIC # 
+-- MAGIC 
+-- MAGIC  
+-- MAGIC - **Reliable** - Self healing architecture streams data with a predictable latency and without loss. Catalog exists to understand usability (quality and structure) of data that is being tracked.
+-- MAGIC - **Explainable** - It is clear how the Data was Created (generated, enhanced and modelled). It is possible to validate that every stage in the processing was completed successfully
+-- MAGIC - **Compliant** End to end private cloud deployment and privacy tooling such as PII pseudonymisation and cookieless tracking to enforce governance on the data and socialise it in a compliant manner. Each line of data is enriched with basis for capture so it is unambiguous how it can be used.
+-- MAGIC - **Accurate** - All data validated up front against predefined schemas; data quality actively monitored and alerted on with extensive debugging, QA and reprocessing tooling
+-- MAGIC - **Predictive** - Behavioral signal is the strongest predictor of intent, the richness of the data is key to this with over 130 properties appended to each event out of the box and an extensible entity model that matches our mental map for the actions taking place.
+-- MAGIC 
+-- MAGIC 
+-- MAGIC 
+-- MAGIC 
+-- MAGIC JSON Schema for an atomic canonical Snowplow event: https://github.com/snowplow/iglu-central/blob/master/schemas/com.snowplowanalytics.snowplow/atomic/jsonschema/1-0-0
+
+-- COMMAND ----------
+
+select 
+  contexts_com_snowplowanalytics_snowplow_ua_parser_context_1.device_family[0] as device_family,
+  contexts_com_snowplowanalytics_snowplow_ua_parser_context_1.useragent_family[0] as browser_family,
+  count(distinct domain_sessionid) as number_of_sessions
+from snowplow_sample_data.events
+where
+  unstruct_event_com_snowplowanalytics_snowplow_link_click_1.target_url = 'https://console.snowplowanalytics.com/'
+  and app_id = 'website'
+group by 1,2
+order by 3 desc
+limit 10
+
+-- COMMAND ----------
+
+
