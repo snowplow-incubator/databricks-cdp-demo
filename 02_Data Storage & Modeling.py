@@ -1,11 +1,74 @@
 # Databricks notebook source
-# MAGIC %md 
-# MAGIC # Propensity to Engage ML Model
+# MAGIC %md
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/databricks_logo.png" width="20%">
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/composable_cdp_architecture.png" width="80%">
+# MAGIC # Data Storage & Modeling
+# MAGIC 
+# MAGIC In this notebook we will be modeling and exploring behavioural data collected by Snowplow's Javascript tracker from Snowplow's [snowplow.io](https://snowplow.io/) website in Databricks.
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Atomic Events Table (Bronze)
+# MAGIC 
+# MAGIC All events are loaded using Snowplow's RDB loader into a single atomic events table backed by Databricks’ Delta tables. We call this a “Wide-row Table” – with one row per event, and one column for each type of entity/property and self-describing event.
+
+# COMMAND ----------
+
+# DBTITLE 1,atomic.events
+# MAGIC %sql
+# MAGIC select * from snowplow.events 
+# MAGIC where app_id = 'website' and collector_tstamp_date = current_date() 
+# MAGIC limit 10
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Create Derived Tables using dbt (Gold - Analytics Ready)
+# MAGIC 
+# MAGIC From the query above we can see it is not easy for someone who doesn't know the atomic events table well to get the answers they need from the data. Querying the atomic events table also requires more compute so ends up being more expensive. We need to flatten these columns and aggregate the events into useful, analytics ready tables.
+# MAGIC 
+# MAGIC To do this we can use Snowplow's dbt web package to transform and aggregate the raw web data into a set of derived **Gold** tables straight out of the box:
+# MAGIC * `page_views`
+# MAGIC * `sessions`
+# MAGIC * `users`
+# MAGIC 
+# MAGIC The package processes all web events incrementally. It is not just constrained to page view events - any custom events you are tracking can also be incrementally processed. 
+# MAGIC 
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_web_model_dag.png" width="40%">
+# MAGIC 
+# MAGIC ### dbt Cloud using Partner Connect
+# MAGIC Easily setup yout dbt Cloud connection using Databricks' [Partner Connect](https://dbc-dcab5385-51e3.cloud.databricks.com/partnerconnect?o=2894723222787945).
+# MAGIC 
+# MAGIC ### Installing the snowplow_web dbt package
+# MAGIC To include the package in your dbt project, include the following in your `packages.yml` file:
+# MAGIC 
+# MAGIC ```yaml
+# MAGIC packages:
+# MAGIC   - package: snowplow/snowplow_web
+# MAGIC     version: [">=0.9.0", "<0.10.0"]
+# MAGIC ```
+# MAGIC 
+# MAGIC Run `dbt deps` to install the package.
+# MAGIC 
+# MAGIC View the package on dbt's [package hub](https://hub.getdbt.com/snowplow/snowplow_web/latest/) or see the [dbt-snowplow-web GitHub repository](https://github.com/snowplow/dbt-snowplow-web) for more information.
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Data Exploration using Databricks SQL
+# MAGIC 
+# MAGIC See DBSQL [Snowplow Website Insights](https://dbc-dcab5385-51e3.cloud.databricks.com/sql/dashboards/d98ec601-48c1-4f28-a06e-b8c75e118147-snowplow-website-insights?o=2894723222787945) dashboard to view some web analytics built on top of Snowplow's derived tables.
+# MAGIC 
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/dashboard_screenshot_1.png" width="70%">
+
+# COMMAND ----------
+
+# MAGIC %md 
+# MAGIC # Propensity to Engage ML Model
 
 # COMMAND ----------
 
@@ -46,6 +109,7 @@
 
 # COMMAND ----------
 
+# DBTITLE 1,Get user features from Snowplow derived tables
 import pandas as pd
 import lightgbm as lgb
 from imblearn.over_sampling import SMOTENC
@@ -117,6 +181,7 @@ for col in continues_col:
 from sklearn.base import BaseEstimator, TransformerMixin
 import numpy as np
 
+# Reduce number of categorical features so `SMOTENC` doesn't run out of memory. 
 class TakeTopK(BaseEstimator, TransformerMixin):
     def __init__(self, k=20):
         self.largest_cat = {}
@@ -170,23 +235,22 @@ disp.plot()
 
 # COMMAND ----------
 
+# DBTITLE 1,Log Model
 import mlflow
+
+# Log model
 mlflow.sklearn.log_model(pipeline, "sklearn_lgbm")
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ### SHAP Analysis and Feature Importance of LightGBM Model:
-# MAGIC **Expainability is key:**
+# MAGIC **Expainability is key:** We can see the importance of the engagement metrics in predicting conversion and that engagement contributes to 25% of the overall model performance.
 # MAGIC 
 # MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/lgbm_shap_analysis.png" width="50%">
 # MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/lgbm_feature_importance.png" width="30%">
 # MAGIC 
 # MAGIC This shows the importance of the engagement metrics in predicting conversion and that engagement contributes to 25% of the overall model performance.
-
-# COMMAND ----------
-
-
 
 # COMMAND ----------
 
@@ -203,10 +267,10 @@ import pandas as pd
 
 logged_model = 'runs:/0c437c842261403dba6d923a1a9b8257/sklearn_lgbm'
 
-# Load model as a PyFuncModel.
+# Load model as a PyFuncModel
 loaded_model = mlflow.pyfunc.load_model(logged_model)
 
-# Predict on a Pandas DataFrame.
+# Predict on Snowplow users
 df = spark.sql(
 """
 with pv as (select domain_userid, absolute_time_in_s, vertical_percentage_scrolled, geo_country,
@@ -230,15 +294,13 @@ df["propensity_score"] = loaded_model.predict(df)
 
 # Add propensity deciles and save to table
 df["propensity_decile"] = pd.qcut(df["propensity_score"], 10, labels=False)
-
 df_spark = spark.createDataFrame(df[["domain_userid", "propensity_score", "propensity_decile"]])
 df_spark.write.mode("overwrite").saveAsTable("default.snowplow_user_propensity_scores")
-
 df.head()
 
 # COMMAND ----------
 
-# DBTITLE 1,User Propensity Scores
+# DBTITLE 1,User Propensity Score Distribution
 import plotly.express as px
 
 fig = px.histogram(df, x="propensity_score", nbins=50)
