@@ -1,6 +1,6 @@
 -- Databricks notebook source
 -- MAGIC %md
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/databricks_logo.png" width="30%">
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/databricks_logo.png" width="20%">
 
 -- COMMAND ----------
 
@@ -19,8 +19,8 @@
 -- COMMAND ----------
 
 -- DBTITLE 1,atomic.events
-select * from snowplow.events 
-where app_id = 'website' and collector_tstamp_date = current_date() 
+select * from snowplow_sample_data.events 
+where app_id = 'website'
 limit 10
 
 -- COMMAND ----------
@@ -38,7 +38,7 @@ limit 10
 select
   contexts_com_snowplowanalytics_snowplow_ua_parser_context_1,
   unstruct_event_com_snowplowanalytics_snowplow_link_click_1
-from snowplow.events
+from snowplow_sample_data.events
 where
   unstruct_event_com_snowplowanalytics_snowplow_link_click_1.target_url is not null
 limit 10
@@ -55,10 +55,9 @@ select
   contexts_com_snowplowanalytics_snowplow_ua_parser_context_1.device_family[0] as device_family,
   contexts_com_snowplowanalytics_snowplow_ua_parser_context_1.useragent_family[0] as browser_family,
   count(distinct domain_sessionid) as number_of_sessions
-from snowplow.events
+from snowplow_sample_data.events
 where
   unstruct_event_com_snowplowanalytics_snowplow_link_click_1.target_url = 'https://console.snowplowanalytics.com/'
-  and collector_tstamp_date >= date_sub(current_date(), 7) 
   and app_id = 'website'
 group by 1,2
 order by 3 desc
@@ -115,17 +114,17 @@ limit 10
 -- COMMAND ----------
 
 -- DBTITLE 1,snowplow_web_page_views
-select * from dbt_cloud_derived.snowplow_web_page_views where start_tstamp_date >= date_sub(current_date(), 1) limit 10
+select * from snowplow_sample_data.snowplow_web_page_views limit 10
 
 -- COMMAND ----------
 
 -- DBTITLE 1,snowplow_web_sessions
-select * from dbt_cloud_derived.snowplow_web_sessions where start_tstamp_date >= date_sub(current_date(), 1) limit 10
+select * from snowplow_sample_data.snowplow_web_sessions limit 10
 
 -- COMMAND ----------
 
 -- DBTITLE 1,snowplow_web_users
-select * from dbt_cloud_derived.snowplow_web_users where start_tstamp_date >= date_sub(current_date(), 1) limit 10
+select * from snowplow_sample_data.snowplow_web_users where limit 10
 
 -- COMMAND ----------
 
@@ -144,10 +143,9 @@ select
   -- round(avg(pv.engaged_time_in_s), 0) as average_engaged_time_in_s,
   round(count(distinct if(s.first_page_title = pv.page_title, domain_sessionid, null))/count(distinct domain_sessionid) * 100, 1) as entrance_page_percentage,
   round(count(distinct if(s.last_page_title = pv.page_title, domain_sessionid, null))/count(distinct domain_sessionid) * 100, 1) as exit_page_percentage
-from dbt_cloud_derived.snowplow_web_page_views pv
-join dbt_cloud_derived.snowplow_web_sessions s using(domain_sessionid)
+from snowplow_sample_data.snowplow_web_page_views pv
+join snowplow_sample_data.snowplow_web_sessions s using(domain_sessionid)
 where pv.page_urlpath like '/blog/%'
-  and pv.start_tstamp_date between date_sub(current_date(), 7) and date_sub(current_date(), 1)
 group by 1
 order by 2 desc
 limit 10
@@ -162,9 +160,8 @@ limit 10
 -- DBTITLE 1,Examine Most Engaged Users
 with intent_pages as (
   select domain_userid, True as has_intent
-  from dbt_cloud_derived.snowplow_web_page_views
+  from snowplow_sample_data.snowplow_web_page_views
   where page_urlpath like '/get-started/%'
-    and start_tstamp_date between date_sub(current_date(), 7) and date_sub(current_date(), 1)
   group by 1
 )
 
@@ -177,9 +174,8 @@ select
   u.referrer, 
   u.mkt_source,
   ifnull(i.has_intent, False) as has_intent_to_convert
-from dbt_cloud_derived.snowplow_web_users u
+from snowplow_sample_data.snowplow_web_users u
 left join intent_pages i using(domain_userid)
-where u.start_tstamp_date between date_sub(current_date(), 7) and date_sub(current_date(), 1)
 order by 2 desc, 3 desc, 4 desc
 limit 20
 
@@ -197,9 +193,8 @@ limit 20
 -- MAGIC   """
 -- MAGIC   with intent_pages as (
 -- MAGIC     select domain_sessionid, True as has_intent
--- MAGIC     from dbt_cloud_derived.snowplow_web_page_views
+-- MAGIC     from snowplow_sample_data.snowplow_web_page_views
 -- MAGIC     where page_urlpath like '/get-started/%'
--- MAGIC       and start_tstamp_date between date_sub(current_date(), 7) and date_sub(current_date(), 1)
 -- MAGIC     group by 1
 -- MAGIC   )
 -- MAGIC   
@@ -207,9 +202,8 @@ limit 20
 -- MAGIC     s.os_family,
 -- MAGIC     ifnull(i.has_intent, False) as has_intent_to_convert,
 -- MAGIC     count(1) as number_of_sessions
--- MAGIC   from dbt_cloud_derived.snowplow_web_sessions s
+-- MAGIC   from snowplow_sample_data.snowplow_web_sessions s
 -- MAGIC   left join intent_pages i using(domain_sessionid)
--- MAGIC   where s.start_tstamp_date between date_sub(current_date(), 7) and date_sub(current_date(), 1)
 -- MAGIC   group by 1, 2
 -- MAGIC   order by 3 desc
 -- MAGIC   """
