@@ -54,4 +54,4 @@
 -- MAGIC **Architecture diagram of the demo solution**
 -- MAGIC 
 -- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/update_to_static_dataset/assets/composable_cdp_new.png" width="60%">
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/composable_cdp_new.png" width="60%">

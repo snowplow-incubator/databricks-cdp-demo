@@ -13,7 +13,7 @@
 -- MAGIC - Control the quality of your data
 -- MAGIC - Own your data asset and infrastructure
 -- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/feature/update_to_static_dataset/assets/snowplow_BDP.png" width="40%">
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_BDP.png" width="40%">
 -- MAGIC 
 -- MAGIC 
 -- MAGIC Accurate and compliant identification of users is the cornerstone of any CDP. With first-party user identifiers included with each event and in-stream privacy tooling, including PII pseudonymization, you have a complete, and compliant view of every customer interaction.
