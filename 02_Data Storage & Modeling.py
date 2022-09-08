@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # 2. Data Storage & Modeling
+# MAGIC # 2. Data Storage & Modeling using Databricks DeltaLake and MLFlow
 # MAGIC 
 # MAGIC In this notebook we will be modeling and exploring behavioural data collected by Snowplow's Javascript tracker from Snowplow's [snowplow.io](https://snowplow.io/) website in Databricks.
 
@@ -15,9 +15,7 @@
 
 # DBTITLE 1,atomic.events
 # MAGIC %sql
-# MAGIC select * from snowplow.events 
-# MAGIC where app_id = 'website' and collector_tstamp_date = current_date() 
-# MAGIC limit 5
+# MAGIC select * from snowplow_samples.snowplow.events limit 10
 
 # COMMAND ----------
 
@@ -107,7 +105,6 @@
 # MAGIC * **Referral** – Referral enrichment
 # MAGIC * **Marketing** –  Marketing campaign enrichment
 # MAGIC * **Geographic** – IP lookup enrichment
-# MAGIC * **Robot** – IAB enrichment
 # MAGIC * **Engagement** – Accumulated page ping events by dbt page view model
 
 # COMMAND ----------
@@ -126,34 +123,31 @@ from imblearn.over_sampling import SMOTENC
 df = spark.sql(
 """
 -- Get additional features from the user's first page view
-with pv as (select domain_userid, absolute_time_in_s, vertical_percentage_scrolled, geo_country,
-                   geo_region, br_lang, spider_or_robot, operating_system_class, operating_system_name,
-                   device_family, os_family, row_number() over (partition by domain_userid order by start_tstamp) as rn
-            from dbt_cloud_derived.snowplow_web_page_views
-            where page_view_in_session_index = 1 and start_tstamp_date >= '2022-08-30'
-            qualify rn = 1)
-select u.start_tstamp, u.domain_userid, u.first_page_title, u.first_page_urlhost, u.first_page_urlpath,
-       u.refr_urlhost, u.refr_medium, u.refr_term, u.mkt_medium, u.mkt_source, u.mkt_term,
-       u.mkt_campaign, u.mkt_content, u.mkt_network, u.engaged_time_in_s, dayofweek(u.start_tstamp) as day_of_week,  
-       hour(u.start_tstamp) as hour, pv.absolute_time_in_s, pv.vertical_percentage_scrolled, pv.geo_country,
-       pv.geo_region, pv.br_lang, pv.spider_or_robot, pv.operating_system_class, pv.operating_system_name,
-       pv.device_family, pv.os_family, ifnull(c.converted, false) as converted_user
-from dbt_cloud_derived.snowplow_web_users u
-     join pv on u.domain_userid = pv.domain_userid
-     left join default.converted_users c using(domain_userid)
-     where u.start_tstamp_date >= '2022-08-30'
+with pv as (select domain_userid, absolute_time_in_s, vertical_percentage_scrolled,
+                   geo_country, geo_region, br_lang, device_family, os_family,
+                   row_number() over (partition by domain_userid order by start_tstamp) as rn
+            from snowplow_samples.dbt_cloud_derived.snowplow_web_page_views
+            where page_view_in_session_index = 1
+                        qualify rn = 1)
+                        
+select u.domain_userid, u.first_page_title, u.refr_urlhost, u.refr_medium,
+       u.mkt_medium, u.mkt_source, u.mkt_term, u.mkt_campaign, u.engaged_time_in_s,
+       pv.absolute_time_in_s, pv.vertical_percentage_scrolled, pv.geo_country,
+       pv.geo_region, pv.br_lang, pv.device_family, pv.os_family,
+       ifnull(c.converted, false) as converted_user
+from snowplow_samples.dbt_cloud_derived.snowplow_web_users u
+     join pv on u.domain_userid = pv.domain_userid and pv.rn = 1
+     left join snowplow_samples.samples.converted_users c using(domain_userid)
 """).toPandas()
 
-ref_cols = ["refr_urlhost", "refr_medium", "refr_term"]
-mkt_cols = ["mkt_medium", "mkt_source", "mkt_term", "mkt_campaign", "mkt_content", "mkt_network"]
+ref_cols = ["refr_urlhost", "refr_medium"]
+mkt_cols = ["mkt_medium", "mkt_source", "mkt_term"]
 geo_cols = ["geo_country", "geo_region", "br_lang"]
-dev_cols = ["device_family", "os_family", "operating_system_class", "operating_system_name"]
+dev_cols = ["device_family", "os_family"]
 url_cols = ["first_page_title"]
-robot_cols = ["spider_or_robot"]
-calendar_cols = ["day_of_week", "hour"]
 engagement_cols = ["engaged_time_in_s", "absolute_time_in_s", "vertical_percentage_scrolled"]
 
-discrete_col = ref_cols + mkt_cols + geo_cols + dev_cols +  calendar_cols + url_cols
+discrete_col = ref_cols + mkt_cols + geo_cols + dev_cols + url_cols
 continues_col = engagement_cols
 
 all_features = discrete_col + continues_col
@@ -163,6 +157,8 @@ for col in discrete_col:
     df[col].fillna("N/A", inplace=True)
 for col in continues_col:
     df[col].fillna(df[col].mean(), inplace=True)
+    
+df.head()
 
 # COMMAND ----------
 
@@ -210,7 +206,7 @@ class TakeTopK(BaseEstimator, TransformerMixin):
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC Oversampling the data set is required due to extreme class imbalance - `0.00043`. `imbalanced-learn` SMOTENC was chosen because data contrains many categorical features.
+# MAGIC Oversampling the data set is required due to extreme class imbalance. `imbalanced-learn` SMOTENC was chosen because data contrains many categorical features.
 
 # COMMAND ----------
 
@@ -220,10 +216,9 @@ smote_nc = SMOTENC(categorical_features=cat_index, k_neighbors=5,  random_state=
 topk = TakeTopK(50)
 X_res, y_res = smote_nc.fit_resample(topk.fit_transform(df_train[all_features]), df_train.converted_user)
 
-topk.transform(df_test[all_features]).head()
-
 # COMMAND ----------
 
+# DBTITLE 1,Run LightGBM Model
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay, fbeta_score
 from sklearn.pipeline import Pipeline
 
@@ -257,13 +252,12 @@ mlflow.sklearn.log_model(pipeline, "sklearn_lgbm")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### 2.4.4. SHAP Analysis and Feature Importance of LightGBM Model:
-# MAGIC **Expainability is key:** We can see the importance of the engagement metrics in predicting conversion and that engagement contributes to 25% of the overall model performance.
-# MAGIC 
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/lgbm_shap_analysis.png" width="50%">
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/lgbm_feature_importance.png" width="30%">
-# MAGIC 
-# MAGIC This shows the importance of the engagement metrics in predicting conversion and that engagement contributes to 25% of the overall model performance.
+# MAGIC ### 2.4.4. Feature Importance of LightGBM Model:
+# MAGIC **Expainability is key:** We can see the importance of the engagement metrics in predicting conversion.
+
+# COMMAND ----------
+
+lgb.plot_importance(pipeline.steps[1][1], max_num_features=15)
 
 # COMMAND ----------
 
@@ -271,7 +265,7 @@ mlflow.sklearn.log_model(pipeline, "sklearn_lgbm")
 # MAGIC ### 2.4.5 Run the Prediction
 # MAGIC Once we have deployed our model using MLflow we can start offline (batch and streaming) inference and online (real-time) serving.
 # MAGIC 
-# MAGIC In this example we use the model to predict on our `snowplow_web_users` table and return a propensity score for each user who has visited the site.
+# MAGIC In this example we use the model to predict and return a propensity score for users who has visited the site.
 
 # COMMAND ----------
 
@@ -279,7 +273,20 @@ mlflow.sklearn.log_model(pipeline, "sklearn_lgbm")
 import mlflow
 import pandas as pd
 
-logged_model = 'runs:/0c437c842261403dba6d923a1a9b8257/sklearn_lgbm'
+def p_label(x):
+    """ Assign a propensity label based on propensity deciles
+        Low is lowest 80% of scores, Medium 80-90% of scores, High is top 10% of scores
+    """
+    if x <= 7:
+        l = "Low"
+    elif x <= 8:
+        l = "Medium"
+    else:
+        l = "High"
+    return l
+
+
+logged_model = 'runs:/d8faf9093a044ac5b6ee1c051698db16/sklearn_lgbm'
 
 # Load model as a PyFuncModel
 loaded_model = mlflow.pyfunc.load_model(logged_model)
@@ -287,29 +294,30 @@ loaded_model = mlflow.pyfunc.load_model(logged_model)
 # Predict on Snowplow users
 df = spark.sql(
 """
-with pv as (select domain_userid, absolute_time_in_s, vertical_percentage_scrolled, geo_country,
-                   geo_region, br_lang, spider_or_robot, operating_system_class, operating_system_name,
-                   device_family, os_family, row_number() over (partition by domain_userid order by start_tstamp) as rn
-            from dbt_cloud_derived.snowplow_web_page_views
-            where page_view_in_session_index = 1 and start_tstamp_date >= '2022-08-30'
-            qualify rn = 1)
-select u.start_tstamp, u.domain_userid, u.first_page_title, u.first_page_urlhost, u.first_page_urlpath,
-       u.refr_urlhost, u.refr_medium, u.refr_term, u.mkt_medium, u.mkt_source, u.mkt_term,
-       u.mkt_campaign, u.mkt_content, u.mkt_network, u.engaged_time_in_s, dayofweek(u.start_tstamp) as day_of_week,  
-       hour(u.start_tstamp) as hour, pv.absolute_time_in_s, pv.vertical_percentage_scrolled, pv.geo_country,
-       pv.geo_region, pv.br_lang, pv.spider_or_robot, pv.operating_system_class, pv.operating_system_name,
-       pv.device_family, pv.os_family
-from dbt_cloud_derived.snowplow_web_users u
-     join pv on u.domain_userid = pv.domain_userid
-     where u.start_tstamp_date >= '2022-08-30'
-"""
-).toPandas()
+-- Get additional features from the user's first page view
+with pv as (select domain_userid, absolute_time_in_s, vertical_percentage_scrolled,
+                   geo_country, geo_region, br_lang, device_family, os_family,
+                   row_number() over (partition by domain_userid order by start_tstamp) as rn
+            from snowplow_samples.dbt_cloud_derived.snowplow_web_page_views
+            where page_view_in_session_index = 1
+                        qualify rn = 1)
+                        
+select u.domain_userid, u.first_page_title, u.refr_urlhost, u.refr_medium,
+       u.mkt_medium, u.mkt_source, u.mkt_term, u.mkt_campaign, u.engaged_time_in_s,
+       pv.absolute_time_in_s, pv.vertical_percentage_scrolled, pv.geo_country,
+       pv.geo_region, pv.br_lang, pv.device_family, pv.os_family
+from snowplow_samples.dbt_cloud_derived.snowplow_web_users u
+     join pv on u.domain_userid = pv.domain_userid and pv.rn = 1
+""").toPandas()
+
 df["propensity_score"] = loaded_model.predict(df)
 
-# Add propensity deciles and save to table
+# Add propensity deciles and labels then save to table
 df["propensity_decile"] = pd.qcut(df["propensity_score"], 10, labels=False)
+df["propensity_label"] = [p_label(x) for x in df["propensity_decile"]]
+
 df_spark = spark.createDataFrame(df[["domain_userid", "propensity_score", "propensity_decile"]])
-df_spark.write.mode("overwrite").saveAsTable("default.snowplow_user_propensity_scores")
+df_spark.write.mode("overwrite").saveAsTable("snowplow_samples.samples.snowplow_user_propensity_scores")
 df.head()
 
 # COMMAND ----------
@@ -317,7 +325,7 @@ df.head()
 # DBTITLE 1,User Propensity Score Distribution
 import plotly.express as px
 
-fig = px.histogram(df, x="propensity_score", nbins=50)
+fig = px.histogram(df, x="propensity_score", color="propensity_label", nbins=100, log_y=True)
 fig.show()
 
 # COMMAND ----------
@@ -326,3 +334,7 @@ fig.show()
 # MAGIC ## 2.5 High Propensity Audience selection
 # MAGIC 
 # MAGIC We have utilised Snowplow's rich behavioural data in this model to generate accurate propensity to engage scores. These can now be used when activating our data to improve audience segmentation and maximise conversions.
+
+# COMMAND ----------
+
+df.sort_values(by=["propensity_score"], ascending=False).head(10)

@@ -1,6 +1,6 @@
 -- Databricks notebook source
 -- MAGIC %md
--- MAGIC # Data Creation with Snowplow
+-- MAGIC # Data Creation using Snowplow
 -- MAGIC 
 -- MAGIC Snowplow Analytics is an open-source enterprise data creation platform that enables data collection from multiple products for advanced data analytics and AI/ML solutions. 
 -- MAGIC 
@@ -29,10 +29,6 @@
 
 -- COMMAND ----------
 
-
-
--- COMMAND ----------
-
 -- MAGIC %md
 -- MAGIC # 1. Creating data for the demo solution
 
@@ -50,7 +46,7 @@
 -- MAGIC df = spark.sql(
 -- MAGIC """
 -- MAGIC select date(collector_tstamp) as Date, count(distinct domain_userid) as users, count(*) as events
--- MAGIC from snowplow_sample_data.events 
+-- MAGIC from snowplow_samples.snowplow.events 
 -- MAGIC where app_id = 'website'
 -- MAGIC group by 1
 -- MAGIC order by 1
@@ -90,9 +86,7 @@
 -- COMMAND ----------
 
 -- DBTITLE 1,Atomic data created by Snowplow [BRONZE TABLE]
-select * from snowplow_sample_data.events 
-where app_id = 'website'
-limit 10
+select * from snowplow_samples.snowplow.events limit 10
 
 -- COMMAND ----------
 
@@ -126,7 +120,7 @@ select
   contexts_com_snowplowanalytics_snowplow_ua_parser_context_1.device_family[0] as device_family,
   contexts_com_snowplowanalytics_snowplow_ua_parser_context_1.useragent_family[0] as browser_family,
   count(distinct domain_sessionid) as number_of_sessions
-from snowplow_sample_data.events
+from snowplow_samples.snowplow.events
 where
   unstruct_event_com_snowplowanalytics_snowplow_link_click_1.target_url = 'https://console.snowplowanalytics.com/'
   and app_id = 'website'
