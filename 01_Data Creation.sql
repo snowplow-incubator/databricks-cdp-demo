@@ -29,8 +29,12 @@
 
 -- COMMAND ----------
 
+
+
+-- COMMAND ----------
+
 -- MAGIC %md
--- MAGIC # Data Creation demo
+-- MAGIC # 1. Creating data for the demo solution
 
 -- COMMAND ----------
 
@@ -111,6 +115,13 @@ limit 10
 
 -- COMMAND ----------
 
+-- MAGIC %md
+-- MAGIC # 1.1. Futher Exploratory Data analysis [EDA] on atomic (BRONZE) table
+-- MAGIC 
+-- MAGIC Even the most granular (atomic) data are very valuable for initial analysis of the data. Getting number of unique users, where the users are coming from, which campaigns etc... 
+
+-- COMMAND ----------
+
 select 
   contexts_com_snowplowanalytics_snowplow_ua_parser_context_1.device_family[0] as device_family,
   contexts_com_snowplowanalytics_snowplow_ua_parser_context_1.useragent_family[0] as browser_family,
@@ -125,4 +136,5 @@ limit 10
 
 -- COMMAND ----------
 
-
+-- MAGIC %md
+-- MAGIC Let's more now into further analysis and data modelling...  NEXT NOTEBOOK
