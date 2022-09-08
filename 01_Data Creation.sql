@@ -21,7 +21,7 @@
 -- MAGIC Using Snowplow’s private deployment model and native connector to Databricks, your unified event stream lands in real-time in the Delta Lake.
 -- MAGIC 
 -- MAGIC 
--- MAGIC **Sources:** 
+-- MAGIC **Resources:** 
 -- MAGIC - What is Snowplow Platform? https://snowplow.io/snowplow-bdp/
 -- MAGIC - What is Data Creation? https://snowplow.io/what-is-data-creation/
 -- MAGIC - What is behavioural data? https://snowplow.io/what-is-behavioral-data/
@@ -80,7 +80,7 @@
 -- MAGIC - IAB
 -- MAGIC 
 -- MAGIC 
--- MAGIC **Sources:**
+-- MAGIC **Resources:**
 -- MAGIC - The list of all available enchrichments: https://docs.snowplow.io/docs/enriching-your-data/available-enrichments/
 -- MAGIC - What is tracking event? https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/browser-tracker/browser-tracker-v3-reference/tracking-events
 -- MAGIC - How to set up a JavaScript tracker to my Web Product: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/javascript-tracker/web-quick-start-guide/

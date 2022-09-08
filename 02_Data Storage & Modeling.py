@@ -1,18 +1,13 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/databricks_logo.png" width="20%">
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC # Data Storage & Modeling
+# MAGIC # 2. Data Storage & Modeling
 # MAGIC 
 # MAGIC In this notebook we will be modeling and exploring behavioural data collected by Snowplow's Javascript tracker from Snowplow's [snowplow.io](https://snowplow.io/) website in Databricks.
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Atomic Events Table (Bronze)
+# MAGIC ## 2.1. Atomic Events Table stored in DeltaLake storage (BRONZE)
 # MAGIC 
 # MAGIC All events are loaded using Snowplow's RDB loader into a single atomic events table backed by Databricks’ Delta tables. We call this a “Wide-row Table” – with one row per event, and one column for each type of entity/property and self-describing event.
 
@@ -22,12 +17,12 @@
 # MAGIC %sql
 # MAGIC select * from snowplow.events 
 # MAGIC where app_id = 'website' and collector_tstamp_date = current_date() 
-# MAGIC limit 10
+# MAGIC limit 5
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Create Derived Tables using dbt (Gold - Analytics Ready)
+# MAGIC ## 2.2 Create Derived Tables using dbt (Gold - Analytics Ready)
 # MAGIC 
 # MAGIC From the query above we can see it is not easy for someone who doesn't know the atomic events table well to get the answers they need from the data. Querying the atomic events table also requires more compute so ends up being more expensive. We need to flatten these columns and aggregate the events into useful, analytics ready tables.
 # MAGIC 
@@ -36,14 +31,26 @@
 # MAGIC * `sessions`
 # MAGIC * `users`
 # MAGIC 
-# MAGIC The package processes all web events incrementally. It is not just constrained to page view events - any custom events you are tracking can also be incrementally processed. 
+# MAGIC Latest version of the DBT Web Package: https://hub.getdbt.com/snowplow/snowplow_web/latest/
 # MAGIC 
 # MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_web_model_dag.png" width="40%">
 # MAGIC 
-# MAGIC ### dbt Cloud using Partner Connect
+# MAGIC 
+# MAGIC ### The dbt package will:
+# MAGIC 
+# MAGIC - Transforms and aggregates raw web event data collected from the Snowplow JavaScript tracker into a set of derived tables: page views, sessions and users.
+# MAGIC - Derives a mapping between user identifiers, allowing for 'session stitching' and the development of a single customer view.
+# MAGIC - Processes all web events incrementally. It is not just constrained to page view events - any custom events you are tracking will also be incrementally processed.
+# MAGIC - Is designed in a modular manner, allowing you to easily integrate your own custom SQL into the incremental framework provided by the package.
+# MAGIC 
+# MAGIC 
+# MAGIC 
+# MAGIC ### Steps to proceed:
+# MAGIC 
+# MAGIC **2.1. Use dbt Cloud using Partner Connect**
 # MAGIC Easily setup yout dbt Cloud connection using Databricks' [Partner Connect](https://dbc-dcab5385-51e3.cloud.databricks.com/partnerconnect?o=2894723222787945).
 # MAGIC 
-# MAGIC ### Installing the snowplow_web dbt package
+# MAGIC **2.2. Install the snowplow_web dbt package**
 # MAGIC To include the package in your dbt project, include the following in your `packages.yml` file:
 # MAGIC 
 # MAGIC ```yaml
@@ -54,12 +61,15 @@
 # MAGIC 
 # MAGIC Run `dbt deps` to install the package.
 # MAGIC 
-# MAGIC View the package on dbt's [package hub](https://hub.getdbt.com/snowplow/snowplow_web/latest/) or see the [dbt-snowplow-web GitHub repository](https://github.com/snowplow/dbt-snowplow-web) for more information.
+# MAGIC 
+# MAGIC **Resources:**
+# MAGIC - Check out all Snowplow's DBT packages (for mobile, video, web): https://hub.getdbt.com/snowplow/
+# MAGIC - How to enable DBT for your Databricks project (if not via Partner Connect): https://github.com/databricks/dbt-databricks
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Data Exploration using Databricks SQL
+# MAGIC ## 2.3 Exploratory Data Analysis of derived tables using Databricks SQL Dashboard
 # MAGIC 
 # MAGIC See DBSQL [Snowplow Website Insights](https://dbc-dcab5385-51e3.cloud.databricks.com/sql/dashboards/d98ec601-48c1-4f28-a06e-b8c75e118147-snowplow-website-insights?o=2894723222787945) dashboard to view some web analytics built on top of Snowplow's derived tables.
 # MAGIC 
@@ -68,26 +78,27 @@
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC # Propensity to Engage ML Model
+# MAGIC ## 2.4 Propensity to Engage ML Model
 
 # COMMAND ----------
 
 # MAGIC %md 
 # MAGIC A propensity to engage solution provides a very flexible way to identify who among your audience is most likely to actually engage with you, for example request a demo / sign up for a trial, purchase a first service/product, request an upgrade, accept an offer etc… 
 # MAGIC 
-# MAGIC This specific demo explores the impact of measuring behaviour data during initial contact with the web-site. With the goal of predicting which users are going to fill out the demo request form based on their first visit on [snowplow.io](https://snowplow.io/) website.
+# MAGIC This specific demo explores the impact of measuring behaviour data during initial contact with the web-site [first touch]. With the goal of predicting which users are going to fill out the demo request form based on their first visit on the demo website.
 # MAGIC 
 # MAGIC Although first touch attribution is less common than final touch or multi touch approach. It is still a useful tool for companies that want to build brand awareness or have a short sales cycle. Impact of other visitor information is constrained to the geographic and time properties, due to limitations by platforms such as Google Ad Campaign. Other factors contributing to the conversion are omitted.
 # MAGIC 
 # MAGIC Snowplow web tracking and modelling provides engagement metrics out of the box like:
 # MAGIC * How much page is scrolled in
 # MAGIC * Time spent engaged with the page
-# MAGIC * How long tab was open in browser
+# MAGIC * How long tab was open and active in browser
+# MAGIC * and many more...
 
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC ## Dataset
+# MAGIC ### 2.4.1. Feature exploration from the data
 # MAGIC Primary features returned from the Snowplow dbt web model can be grouped into categories based on their origin:
 # MAGIC 
 # MAGIC * **Temporal** – created from first event timestamp: an hour of the day, day of the week.
@@ -98,10 +109,6 @@
 # MAGIC * **Geographic** – IP lookup enrichment
 # MAGIC * **Robot** – IAB enrichment
 # MAGIC * **Engagement** – Accumulated page ping events by dbt page view model
-# MAGIC 
-# MAGIC Conversion events are taken from Salesforce, using different tracking methods. However, in practice Snowplow users could send a custom conversion event to avoid joining another data source. Read Snowplow's documentation about setting this up [here](https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/javascript-tracker/javascript-tracker-v3/tracking-events/).
-# MAGIC 
-# MAGIC Most recent data should not be considered for the performance as some users have not converted yet (the purchase cycle for Snowplow BDP can be long).
 
 # COMMAND ----------
 
@@ -159,7 +166,7 @@ for col in continues_col:
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Model Selection and Performance
+# MAGIC ### 2.4.2. Model Selection and Performance
 # MAGIC 
 # MAGIC The following classifiers are analysed: Logistic Regression, SVM (with linear kernel) and Gradient Boosting Trees. Other methods were considered - Random Forest, Neural Networks and Sharpie, MCMC, etc. But were excluded for high computational overhead or lack of interpretability. The best suited model for our project was the LGBM.
 # MAGIC 
@@ -244,7 +251,7 @@ mlflow.sklearn.log_model(pipeline, "sklearn_lgbm")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### SHAP Analysis and Feature Importance of LightGBM Model:
+# MAGIC ### 2.4.3. SHAP Analysis and Feature Importance of LightGBM Model:
 # MAGIC **Expainability is key:** We can see the importance of the engagement metrics in predicting conversion and that engagement contributes to 25% of the overall model performance.
 # MAGIC 
 # MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/lgbm_shap_analysis.png" width="50%">
@@ -255,13 +262,14 @@ mlflow.sklearn.log_model(pipeline, "sklearn_lgbm")
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC ## Using our Model for Inference and Prediction
+# MAGIC ## 2.5 Using our Model for Inference and Prediction
 # MAGIC Once we have deployed our model using MLflow we can start offline (batch and streaming) inference and online (real-time) serving.
 # MAGIC 
 # MAGIC In this example we use the model to predict on our `snowplow_web_users` table and return a propensity score for each user who has visited the site.
 
 # COMMAND ----------
 
+# DBTITLE 1,Final table with High Propensity visitors for the activation
 import mlflow
 import pandas as pd
 
