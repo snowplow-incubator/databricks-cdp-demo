@@ -78,7 +78,7 @@
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC ## 2.4 Propensity to Engage ML Model
+# MAGIC ## 2.4 Propensity to Engage ML Model creation
 
 # COMMAND ----------
 
@@ -112,6 +112,7 @@
 
 # COMMAND ----------
 
+# DBTITLE 1,Installing MLFlow
 # MAGIC %pip install mlflow lightgbm imblearn
 
 # COMMAND ----------
@@ -177,14 +178,14 @@ for col in continues_col:
 # MAGIC * Better accuracy
 # MAGIC * Support of parallel, distributed, and GPU learning
 # MAGIC * Capable of handling large-scale data
+# MAGIC 
+# MAGIC 
+# MAGIC **Resources:** 
+# MAGIC - Full LightGBM Documentation: https://lightgbm.readthedocs.io/en/v3.3.2/
 
 # COMMAND ----------
 
-# MAGIC %md
-# MAGIC Reduce number of categorical features so `SMOTENC` doesn't run out of memory. 
-
-# COMMAND ----------
-
+# DBTITLE 1,Reduce number of categorical features so `SMOTENC` doesn't run out of memory. 
 from sklearn.base import BaseEstimator, TransformerMixin
 import numpy as np
 
@@ -242,7 +243,12 @@ disp.plot()
 
 # COMMAND ----------
 
-# DBTITLE 1,Log Model
+# MAGIC %md
+# MAGIC ### 2.4.3. Store the model
+
+# COMMAND ----------
+
+# DBTITLE 1,Store the trained model in Databricks project
 import mlflow
 
 # Log model
@@ -251,7 +257,7 @@ mlflow.sklearn.log_model(pipeline, "sklearn_lgbm")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### 2.4.3. SHAP Analysis and Feature Importance of LightGBM Model:
+# MAGIC ### 2.4.4. SHAP Analysis and Feature Importance of LightGBM Model:
 # MAGIC **Expainability is key:** We can see the importance of the engagement metrics in predicting conversion and that engagement contributes to 25% of the overall model performance.
 # MAGIC 
 # MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/lgbm_shap_analysis.png" width="50%">
@@ -262,14 +268,14 @@ mlflow.sklearn.log_model(pipeline, "sklearn_lgbm")
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC ## 2.5 Using our Model for Inference and Prediction
+# MAGIC ### 2.4.5 Run the Prediction
 # MAGIC Once we have deployed our model using MLflow we can start offline (batch and streaming) inference and online (real-time) serving.
 # MAGIC 
 # MAGIC In this example we use the model to predict on our `snowplow_web_users` table and return a propensity score for each user who has visited the site.
 
 # COMMAND ----------
 
-# DBTITLE 1,Final table with High Propensity visitors for the activation
+# DBTITLE 0,Final table with High Propensity visitors for the activation
 import mlflow
 import pandas as pd
 
@@ -317,6 +323,6 @@ fig.show()
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC ## Next Step:
+# MAGIC ## 2.5 High Propensity Audience selection
 # MAGIC 
 # MAGIC We have utilised Snowplow's rich behavioural data in this model to generate accurate propensity to engage scores. These can now be used when activating our data to improve audience segmentation and maximise conversions.
