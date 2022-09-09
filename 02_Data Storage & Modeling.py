@@ -76,7 +76,7 @@
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC ## 2.4 Propensity to Engage ML Model creation
+# MAGIC ## 2.4 Create Propensity to Convert ML Model creation
 
 # COMMAND ----------
 
@@ -109,8 +109,18 @@
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ### 2.4.2. Installing the MLFlow
+
+# COMMAND ----------
+
 # DBTITLE 1,Installing MLFlow
 # MAGIC %pip install mlflow lightgbm imblearn
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### 2.4.3. Get user features from Snowplow derived tables
 
 # COMMAND ----------
 
@@ -163,7 +173,7 @@ df.head()
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### 2.4.2. Model Selection and Performance
+# MAGIC ### 2.4.4. Model Selection and Performance
 # MAGIC 
 # MAGIC The following classifiers are analysed: Logistic Regression, SVM (with linear kernel) and Gradient Boosting Trees. Other methods were considered - Random Forest, Neural Networks and Sharpie, MCMC, etc. But were excluded for high computational overhead or lack of interpretability. The best suited model for our project was the LGBM.
 # MAGIC 
@@ -178,6 +188,12 @@ df.head()
 # MAGIC 
 # MAGIC **Resources:** 
 # MAGIC - Full LightGBM Documentation: https://lightgbm.readthedocs.io/en/v3.3.2/
+# MAGIC - Parallelized LightGBM with Spark migration tips: https://github.com/microsoft/SynapseML/issues/889
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### 2.4.5. Reduce number of categorical features so `SMOTENC` doesn't run out of memory. 
 
 # COMMAND ----------
 
@@ -218,6 +234,11 @@ X_res, y_res = smote_nc.fit_resample(topk.fit_transform(df_train[all_features]),
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ### 2.4.6. Run LightGBM Model
+
+# COMMAND ----------
+
 # DBTITLE 1,Run LightGBM Model
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay, fbeta_score
 from sklearn.pipeline import Pipeline
@@ -239,7 +260,7 @@ disp.plot()
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### 2.4.3. Store the model
+# MAGIC ### 2.4.7. Store the model
 
 # COMMAND ----------
 
@@ -252,7 +273,7 @@ mlflow.sklearn.log_model(pipeline, "sklearn_lgbm")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### 2.4.4. Feature Importance of LightGBM Model:
+# MAGIC ### 2.4.8. Feature Importance of LightGBM Model:
 # MAGIC **Expainability is key:** We can see the importance of the engagement metrics in predicting conversion.
 
 # COMMAND ----------
@@ -262,7 +283,7 @@ lgb.plot_importance(pipeline.steps[1][1], max_num_features=15)
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC ### 2.4.5 Run the Prediction
+# MAGIC ### 2.4.9. Run the Prediction
 # MAGIC Once we have deployed our model using MLflow we can start offline (batch and streaming) inference and online (real-time) serving.
 # MAGIC 
 # MAGIC In this example we use the model to predict and return a propensity score for users who has visited the site.
@@ -331,7 +352,7 @@ fig.show()
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC ## 2.5 High Propensity Audience selection
+# MAGIC ## 2.5. Create a table of visitors with High Propensity to Engage
 # MAGIC 
 # MAGIC We have utilised Snowplow's rich behavioural data in this model to generate accurate propensity to engage scores. These can now be used when activating our data to improve audience segmentation and maximise conversions.
 

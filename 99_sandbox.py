@@ -28,16 +28,3 @@
 # COMMAND ----------
 
 
-
-# COMMAND ----------
-
-# MAGIC %pip install delta_sharing
-
-# COMMAND ----------
-
-import delta_sharing
-
-# COMMAND ----------
-
-delta_sharing.load_as_spark("profile#share.schema.table")
-# Sharing Identifier: aws:us-west-2:b169b504-4c54-49f2-bc3a-adf4b128f36d 

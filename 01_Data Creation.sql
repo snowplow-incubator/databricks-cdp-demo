@@ -1,6 +1,6 @@
 -- Databricks notebook source
 -- MAGIC %md
--- MAGIC # Data Creation using Snowplow
+-- MAGIC # 1. Data Creation using Snowplow
 -- MAGIC 
 -- MAGIC Snowplow Analytics is an open-source enterprise data creation platform that enables data collection from multiple products for advanced data analytics and AI/ML solutions. 
 -- MAGIC 
@@ -30,7 +30,7 @@
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC # 1. Creating data for the demo solution
+-- MAGIC ## 1.1 Creating the data
 
 -- COMMAND ----------
 
@@ -85,11 +85,14 @@
 
 -- COMMAND ----------
 
--- DBTITLE 1,Atomic data created by Snowplow [BRONZE TABLE]
-select * from snowplow_samples.snowplow.events limit 10
-
--- COMMAND ----------
-
+-- MAGIC %md
+-- MAGIC ## 1.2 Set your Databricks Loader
+-- MAGIC 
+-- MAGIC 
+-- MAGIC - Setting up Databricks Loader for Snowplow: https://docs.snowplow.io/docs/pipeline-components-and-applications/loaders-storage-targets/snowplow-rdb-loader-3-0-0/loading-transformed-data/databricks-loader
+-- MAGIC - GIT Repo: https://github.com/snowplow/snowplow-rdb-loader
+-- MAGIC 
+-- MAGIC 
 -- MAGIC %md
 -- MAGIC Snowplow's data use **RECAP** framework to help customers create right data with the right quality:
 -- MAGIC 
@@ -110,9 +113,14 @@ select * from snowplow_samples.snowplow.events limit 10
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC # 1.1. Futher Exploratory Data analysis [EDA] on atomic (BRONZE) table
+-- MAGIC ## 1.3 Start exploring the data from atomic (BRONZE) table
 -- MAGIC 
 -- MAGIC Even the most granular (atomic) data are very valuable for initial analysis of the data. Getting number of unique users, where the users are coming from, which campaigns etc... 
+
+-- COMMAND ----------
+
+-- DBTITLE 1,Atomic data created by Snowplow [BRONZE TABLE]
+select * from snowplow_samples.snowplow.events limit 10
 
 -- COMMAND ----------
 

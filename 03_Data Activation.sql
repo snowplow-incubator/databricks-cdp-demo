@@ -1,15 +1,15 @@
 -- Databricks notebook source
 -- MAGIC %md
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_logo.png" width="15%">
+-- MAGIC # 3. Audience Activation using Hightouch
+-- MAGIC 
+-- MAGIC Hightouch syncs your data in Databricks to the tools that your business teams rely on. In this notebook we will use Hightouch to create rule based audiences from our Gold Databricks tables so we can sync them to various destinations like Braze.
 
 -- COMMAND ----------
 
+-- DBTITLE 0,Untitled
 -- MAGIC %md
--- MAGIC # Data Activation using Hightouch
 -- MAGIC 
--- MAGIC Hightouch syncs your data in Databricks to the tools that your business teams rely on.
--- MAGIC 
--- MAGIC In this notebook we will use Hightouch to create rule based audiences from our Gold Databricks tables so we can sync them to various destinations like Braze.
+-- MAGIC ## 3.1. Connect Hightough and Databricks via PartnerConnect
 -- MAGIC 
 -- MAGIC We can easily connect to Hightouch from Databricks using [Partner Connect](https://dbc-dcab5385-51e3.cloud.databricks.com/partnerconnect?o=2894723222787945):
 -- MAGIC 
@@ -22,9 +22,9 @@
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC ## Audiences
+-- MAGIC ## 3.2. Create the audience cohort
 -- MAGIC 
--- MAGIC Say our Marketing team want to target two user segments, *Awareness Users* and *Engagement Users*, based on their web beavioural data. They need these users available in the team's CRM tool, Braze, to launch the email campaigns. We can set this up by creating two new Hightouch audiences.
+-- MAGIC Say our Marketing team want to target two user segments, *Awareness Users* and *Engagement Users*, based on their web beavioural data. They need these users available in the team's Marketing tool, Braze, to launch the email campaigns. We can set this up by creating two new Hightouch audiences.
 -- MAGIC 
 -- MAGIC First we create a parent model based on all our `snowplow_web_users` table for the audiences to be built off of (see [here](https://app.hightouch.com/snowplow-yzw4c/audiences/setup/parent-models/591471)). 
 
@@ -71,7 +71,7 @@
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC ### Connecting our Audiences to Braze
+-- MAGIC ### 3.3. Sync the Audiences to Braze
 -- MAGIC 
 -- MAGIC After setting up Braze as a [destination](https://app.hightouch.com/snowplow-yzw4c/destinations) in Hightouch, we can sync up our new audiences. In this case we want to sync these audiences to our *Awareness Users* and *Engagement Users* Braze subscription groups.
 -- MAGIC 
