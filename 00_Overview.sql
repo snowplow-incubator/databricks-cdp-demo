@@ -21,20 +21,18 @@
 -- MAGIC %md
 -- MAGIC # Introduction to the Solution demo
 -- MAGIC 
--- MAGIC This solution demonstrates the concept of Composable CDP by using the best-in-class tools for each step of the process. Snowplow platform for getting user behavioural data from your product (visitors), Databricks DeltaLake to store the data, Databricks and MLFlow for training and executing sophisticated ML predictions to determine a likelihood of conversion and Hightouch Activation platform to synchronize the cohort with highest propensity score with marketing tools Braze, Salesforce and Facebook Ads and accelerate their conversion into the qualified leads.
+-- MAGIC This solution demonstrates the concept of Composable CDP by using the best-in-class tools for each step of the process. Snowplow platform for getting user behavioural data from your product (visitors), Databricks DeltaLake to store the data, Databricks and MLFlow for training and executing sophisticated ML predictions to determine a likelihood of conversion and Hightouch Activation platform to synchronize the Engagement and Awareness segments with marketing tools (like Braze, Salesforce and Facebook Ads) and accelerate their conversion into the qualified leads.
 -- MAGIC 
 -- MAGIC **Key facts about the demo set up:**
 -- MAGIC - behavioural data created represents visitors of a website from B2B SaaS company with a simple conversion action (ask for demo)
--- MAGIC - The propensity scoring is based on the first touch of user in the product. 
--- MAGIC - Creating 1 highly accurate ML Audience segment of visitors with very high propensity to convert
--- MAGIC - Comparing the performance against one static Audienc segment created by Marketing person 
--- MAGIC 
+-- MAGIC - The propensity scoring is based on the first touch of user in the product.
+-- MAGIC - The output of the demo is 1 table of visitors with high propensity to engage with your product
 -- MAGIC 
 -- MAGIC ----------------------------------------------------------------------------------------
 -- MAGIC Now, let's walk through the process of how this was enabled:
 -- MAGIC 
 -- MAGIC 
--- MAGIC **Step 1.** Create of rich behavioural data from testing data product (website of B2B company)
+-- MAGIC **Step 1.** Create of rich behavioural data from testing data product 
 -- MAGIC 
 -- MAGIC **Step 2.** Apply enrichments features to enhance the data and select snowplow web dbt package
 -- MAGIC 
@@ -42,9 +40,9 @@
 -- MAGIC 
 -- MAGIC **Step 4.** Select initial features to run the Propensity model and enrich the dataset with the Propensity score
 -- MAGIC 
--- MAGIC **Step 5.** Via Audience builder, select the cohort with the highest propensity score and sync with Braze and SFMC
+-- MAGIC **Step 5.** Via Audience builder, select from the table HighPropensity table visitors for *Awareness* and *Engagement* camapaigns
 -- MAGIC 
--- MAGIC **Step 6.** Run personalised marketing campaigns for the selected cohort
+-- MAGIC **Step 6.** Run personalised marketing campaigns for the selected cohorts
 -- MAGIC 
 -- MAGIC **Step 7.** Measure the performance of the cohort and other web analytics performance indicators
 
