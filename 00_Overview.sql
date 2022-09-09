@@ -53,3 +53,12 @@
 -- MAGIC 
 -- MAGIC 
 -- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/composable_cdp_new.png" width="60%">
+
+-- COMMAND ----------
+
+-- MAGIC %md
+-- MAGIC 
+-- MAGIC **Created audiences in Hightouch**
+-- MAGIC 
+-- MAGIC 
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/composable_cdp_new.png" width="60%">
