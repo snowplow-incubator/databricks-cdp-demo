@@ -337,7 +337,7 @@ df["propensity_score"] = loaded_model.predict(df)
 df["propensity_decile"] = pd.qcut(df["propensity_score"], 10, labels=False)
 df["propensity_label"] = [p_label(x) for x in df["propensity_decile"]]
 
-df_spark = spark.createDataFrame(df[["domain_userid", "propensity_score", "propensity_decile"]])
+df_spark = spark.createDataFrame(df[["domain_userid", "propensity_score", "propensity_decile", "propensity_label"]])
 df_spark.write.mode("overwrite").saveAsTable("snowplow_samples.samples.snowplow_user_propensity_scores")
 df.head()
 
@@ -358,4 +358,4 @@ fig.show()
 
 # COMMAND ----------
 
-df.sort_values(by=["propensity_score"], ascending=False).head(10)
+df[df["propensity_label"] == "High"].sort_values(by=["propensity_score"], ascending=False).head(10)
