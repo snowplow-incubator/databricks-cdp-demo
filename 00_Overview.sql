@@ -61,4 +61,4 @@
 -- MAGIC **Created audiences in Hightouch**
 -- MAGIC 
 -- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/Hightouch_audiences.png" width="30%">
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/Hightouch_audiences.png" width="40%">

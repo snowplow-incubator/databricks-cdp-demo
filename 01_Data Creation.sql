@@ -93,7 +93,6 @@
 -- MAGIC - GIT Repo: https://github.com/snowplow/snowplow-rdb-loader
 -- MAGIC 
 -- MAGIC 
--- MAGIC %md
 -- MAGIC Snowplow's data use **RECAP** framework to help customers create right data with the right quality:
 -- MAGIC 
 -- MAGIC # 
