@@ -81,7 +81,7 @@
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC A propensity to engage solution provides a very flexible way to identify who among your audience is most likely to actually engage with you, for example request a demo / sign up for a trial, purchase a first service/product, request an upgrade, accept an offer etc… 
+# MAGIC This propensity to engage solution provides a very flexible way to identify who among your audience is most likely to actually engage with you, for example request a demo / sign up for a trial, purchase a first service/product, request an upgrade, accept an offer etc… 
 # MAGIC 
 # MAGIC This specific demo explores the impact of measuring behaviour data during initial contact with the web-site [first touch]. With the goal of predicting which users are going to fill out the demo request form based on their first visit on the demo website.
 # MAGIC 
@@ -235,6 +235,12 @@ X_res, y_res = smote_nc.fit_resample(topk.fit_transform(df_train[all_features]),
 # COMMAND ----------
 
 # MAGIC %md
+# MAGIC **Resource:** 
+# MAGIC - Learn more about SMOTENC: https://medium.com/analytics-vidhya/smote-nc-in-ml-categorization-models-fo-imbalanced-datasets-8adbdcf08c25
+
+# COMMAND ----------
+
+# MAGIC %md
 # MAGIC ### 2.4.6. Run LightGBM Model
 
 # COMMAND ----------
@@ -273,8 +279,15 @@ mlflow.sklearn.log_model(pipeline, "sklearn_lgbm")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### 2.4.8. Feature Importance of LightGBM Model:
-# MAGIC **Expainability is key:** We can see the importance of the engagement metrics in predicting conversion.
+# MAGIC ### 2.4.8. Feature Importance for the model performance:
+# MAGIC **Expainability is key:** We can see the importance of the engagement metrics in predicting conversion. 
+# MAGIC 
+# MAGIC **The presence of user behavioural metrics like 
+# MAGIC  - Vertical Scrolling (on the pages)
+# MAGIC  - Engaged time (on the pages)
+# MAGIC  - Absolute time (spent on the website) 
+# MAGIC  
+# MAGIC  support the model performance from 40%**
 
 # COMMAND ----------
 
