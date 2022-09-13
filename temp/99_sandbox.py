@@ -8,7 +8,7 @@
 # MAGIC * **Marketing Strategy:** Focus remarketing efforts on prospects with a hight propensity to convert.
 # MAGIC 
 # MAGIC * **Audience Segmentation:**
-# MAGIC   * Heuristic-Driven
+# MAGIC   * Rules-based
 # MAGIC   * ML-Driven
 
 # COMMAND ----------
@@ -217,11 +217,76 @@
 
 # COMMAND ----------
 
+import re
+import mlflow
+import pandas as pd
+#from category_encoders.hashing import HashingEncoder
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import RepeatedStratifiedKFold
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import average_precision_score
+from hyperopt import fmin, tpe, rand, hp, Trials, STATUS_OK, SparkTrials, space_eval
+from mlflow.models.signature import infer_signature
+from xgboost import XGBClassifier
+from pyspark.sql.functions import col
+from pyspark.sql.types import DoubleType, StringType
+from hyperopt.pyll.base import scope
+
+# COMMAND ----------
+
+# Get list of a users features based on first touch model
+df = spark.sql(
+"""
+-- Get additional features from the user's first page view
+with pv as (select domain_userid, absolute_time_in_s, vertical_percentage_scrolled,
+                   geo_country, geo_region, br_lang, device_family, os_family,
+                   row_number() over (partition by domain_userid order by start_tstamp) as rn
+            from snowplow_samples.dbt_cloud_derived.snowplow_web_page_views
+            where page_view_in_session_index = 1
+                        qualify rn = 1)
+                        
+select u.domain_userid, u.first_page_title, u.refr_urlhost, u.refr_medium,
+       u.mkt_medium, u.mkt_source, u.mkt_term, u.mkt_campaign, u.engaged_time_in_s,
+       pv.absolute_time_in_s, pv.vertical_percentage_scrolled, pv.geo_country,
+       pv.geo_region, pv.br_lang, pv.device_family, pv.os_family,
+       ifnull(c.converted, false) as converted_user
+from snowplow_samples.dbt_cloud_derived.snowplow_web_users u
+     join pv on u.domain_userid = pv.domain_userid and pv.rn = 1
+     left join snowplow_samples.samples.converted_users c using(domain_userid)
+""").toPandas()
+
+ref_cols = ["refr_urlhost", "refr_medium"]
+mkt_cols = ["mkt_medium", "mkt_source", "mkt_term"]
+geo_cols = ["geo_country", "geo_region", "br_lang"]
+dev_cols = ["device_family", "os_family"]
+url_cols = ["first_page_title"]
+engagement_cols = ["engaged_time_in_s", "absolute_time_in_s", "vertical_percentage_scrolled"]
+
+discrete_col = ref_cols + mkt_cols + geo_cols + dev_cols + url_cols
+continues_col = engagement_cols
+
+all_features = discrete_col + continues_col
+
+# Input missing data
+for col in discrete_col:
+    df[col].fillna("N/A", inplace=True)
+for col in continues_col:
+    df[col].fillna(df[col].mean(), inplace=True)
+    
+df.head()
+
+# COMMAND ----------
+
+df = df.drop(['domain_userid','mkt_campaign','mkt_source','refr_urlhost','mkt_term','geo_country','geo_region','br_lang','device_family', 'os_family','first_page_title'],axis=1)
+df = pd.get_dummies(df,columns=['refr_medium','mkt_medium'],dtype='int64')
+
+# COMMAND ----------
+
 # DBTITLE 1,Create train and test data sets
-features =['device_w','device_connectiontype','device_devicetype','device_lat','imp_bidfloor']
+features = list(df.columns[:-1])
  
-df = spark.table('field_demos_media.rtb_dlt_bids_gold').toPandas()
-X_train, X_test, y_train, y_test = train_test_split(df[features], df['in_view'], test_size=0.33, random_state=55)
+#df = spark.table('field_demos_media.rtb_dlt_bids_gold').toPandas()
+X_train, X_test, y_train, y_test = train_test_split(df[features], df['converted_user'], test_size=0.33, random_state=55)
 
 # COMMAND ----------
 
@@ -281,14 +346,14 @@ with mlflow.start_run(run_name='XGBClassifier') as run:
 # COMMAND ----------
 
 # DBTITLE 1,Save our new model to the registry as a version
-model_registered = mlflow.register_model("runs:/"+run_id+"/model", "field_demos_rtb")
+model_registered = mlflow.register_model("runs:/"+run_id+"/model", "field_demos_ccdp")
 
 # COMMAND ----------
 
 # DBTITLE 1,Flag this version as production ready
 client = mlflow.tracking.MlflowClient()
 print("registering model version "+model_registered.version+" as production model")
-client.transition_model_version_stage(name = "field_demos_rtb", version = model_registered.version, stage = "Production", archive_existing_versions=True)
+client.transition_model_version_stage(name = "field_demos_ccdp", version = model_registered.version, stage = "Production", archive_existing_versions=True)
 
 # COMMAND ----------
 
@@ -314,18 +379,22 @@ client.transition_model_version_stage(name = "field_demos_rtb", version = model_
 #                                 Stage/version
 #                       Model name       |
 #                           |            |
-model_path = 'models:/field_demos_rtb/Production'
-predict_in_view = mlflow.pyfunc.spark_udf(spark, model_path, result_type = DoubleType())
+model_path = 'models:/field_demos_ccdp/Production'
+predict_propensity = mlflow.pyfunc.spark_udf(spark, model_path, result_type = StringType())
 
 
 # COMMAND ----------
 
 # DBTITLE 1,Perform inference
-model_features = predict_in_view.metadata.get_input_schema().input_names()
-new_df = spark.table('field_demos_media.rtb_dlt_bids_gold').select(*model_features)
-display(
-  new_df.withColumn('in_view_prediction', predict_in_view(*model_features)).filter(col('in_view_prediction') == 1)
-)
+model_features = predict_propensity.metadata.get_input_schema().input_names()
+#new_df = spark.table('field_demos_media.rtb_dlt_bids_gold').select(*model_features)
+new_df = spark.createDataFrame(df)
+new_df = new_df.withColumn('propensity_prediction', predict_propensity(*model_features))
+display(new_df.filter(new_df.propensity_prediction == True))
+
+# COMMAND ----------
+
+
 
 # COMMAND ----------
 

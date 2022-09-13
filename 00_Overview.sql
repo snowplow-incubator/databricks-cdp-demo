@@ -1,6 +1,20 @@
 -- Databricks notebook source
 -- MAGIC %md
--- MAGIC # Introduction of Composable CDP platform
+-- MAGIC ## Demo Overview
+-- MAGIC * **Background:** Everyday, data practicioners across the globe visit Snowplow's website to learn how the leader in data creation helps organizations create and maintain high quality and privacy-compliant first party data. While some of these visitors request a demo instantly, others remain in the awareness stage of the marketing funnel for some time.
+-- MAGIC 
+-- MAGIC * **Business Objective:** Convert prospects from awareness to engaged users (request for demo).
+-- MAGIC 
+-- MAGIC * **Marketing Strategy:** Focus remarketing efforts (and marketing $$) on prospects with a high propensity to convert.
+-- MAGIC 
+-- MAGIC * **Audience:**
+-- MAGIC   * Rules-based segment
+-- MAGIC   * ML-based segment
+
+-- COMMAND ----------
+
+-- MAGIC %md
+-- MAGIC ## Introduction of Composable CDP platform
 -- MAGIC 
 -- MAGIC The definition of Customer Data Platforms has evolved numerous times since their inception in 2013. Gartner currently defines CDPs as "software application that supports marketing and customer experience use cases by unifying a company's customer data from marketing and other channels. CDPs optimize the timing and targeting of messages, offers and customer engagement activities, and enables the analysis of individual-level customer behavior over time."
 -- MAGIC 
@@ -19,7 +33,7 @@
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC # Introduction to the Solution demo
+-- MAGIC ## Demo introduction
 -- MAGIC 
 -- MAGIC This solution demonstrates the concept of Composable CDP by using the best-in-class tools for each step of the process. Snowplow platform for getting user behavioural data from your product (visitors), Databricks DeltaLake to store the data, Databricks and MLFlow for training and executing sophisticated ML predictions to determine a likelihood of conversion and Hightouch Activation platform to synchronize the Engagement and Awareness segments with marketing tools (like Braze, Salesforce and Facebook Ads) and accelerate their conversion into the qualified leads.
 -- MAGIC 
@@ -53,12 +67,3 @@
 -- MAGIC 
 -- MAGIC 
 -- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/composable_cdp_new.png" width="60%">
-
--- COMMAND ----------
-
--- MAGIC %md
--- MAGIC 
--- MAGIC **Created audiences in Hightouch**
--- MAGIC 
--- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/Hightouch_audiences.png" width="40%">
