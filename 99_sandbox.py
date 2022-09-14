@@ -196,11 +196,7 @@
 # MAGIC 
 # MAGIC We can easily connect to Hightouch from Databricks using [Partner Connect](https://dbc-dcab5385-51e3.cloud.databricks.com/partnerconnect?o=2894723222787945):
 # MAGIC 
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_partner_connect.png" width="25%">
-# MAGIC 
-# MAGIC Once setup we can see our Databricks cluster in the [Sources](https://app.hightouch.com/snowplow-yzw4c/sources) tab in Hightouch:
-# MAGIC 
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_sources.png" width="25%">
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/activation_steps.png" width="100%">
 
 # COMMAND ----------
 

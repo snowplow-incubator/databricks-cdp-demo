@@ -334,6 +334,10 @@ predict_propensity = mlflow.pyfunc.spark_udf(spark, model_path, result_type = St
 # COMMAND ----------
 
 model_features = predict_propensity.metadata.get_input_schema().input_names()
+
+df = spark.table('snowplow_samples.samples.snowplow_website_users_first_touch_gold').toPandas()
+df = pd.get_dummies(df,columns=['refr_medium','mkt_medium'],dtype='int64')
+
 new_df = spark.table('snowplow_samples.samples.snowplow_website_users_first_touch_gold').select(*model_features)
 
 display(new_df.head())
