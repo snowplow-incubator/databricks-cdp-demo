@@ -35,7 +35,7 @@
 -- MAGIC %md
 -- MAGIC ## Demo introduction
 -- MAGIC 
--- MAGIC This solution demonstrates the concept of Composable CDP by using the best-in-class tools for each step of the process. Snowplow platform for getting user behavioural data from your product (visitors), Databricks DeltaLake to store the data, Databricks and MLFlow for training and executing sophisticated ML predictions to determine a likelihood of conversion and Hightouch Activation platform to synchronize the Engagement and Awareness segments with marketing tools (like Braze, Salesforce and Facebook Ads) and accelerate their conversion into the qualified leads.
+-- MAGIC This solution demonstrates the concept of Composable CDP by using the best-in-class tools for each step of the process. Snowplow platform for getting user behavioural data from your product (visitors), Databricks DeltaLake to store the data, Databricks and MLFlow for training and executing sophisticated ML predictions to determine a likelihood of conversion and Hightouch Activation platform to synchronize the audience segment with marketing tools (like Braze, Salesforce and Facebook Ads) and accelerate their conversion into the qualified leads.
 -- MAGIC 
 -- MAGIC **Key facts about the demo set up:**
 -- MAGIC - behavioural data created represents visitors of a website from B2B SaaS company with a simple conversion action (ask for demo)
@@ -54,7 +54,7 @@
 -- MAGIC 
 -- MAGIC **Step 4.** Select initial features to run the Propensity model and enrich the dataset with the Propensity score
 -- MAGIC 
--- MAGIC **Step 5.** Via Audience builder, select from the table HighPropensity table visitors for *Awareness* and *Engagement* camapaigns
+-- MAGIC **Step 5.** Via Audience builder, select from the table HighPropensity table visitors for *Awareness* campaigns
 -- MAGIC 
 -- MAGIC **Step 6.** Run personalised marketing campaigns for the selected cohorts
 -- MAGIC 

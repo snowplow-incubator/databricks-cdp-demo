@@ -148,8 +148,8 @@ with pv as (select domain_userid, absolute_time_in_s, vertical_percentage_scroll
             where page_view_in_session_index = 1
                         qualify rn = 1)
                         
-select u.domain_userid, u.first_page_title, u.refr_urlhost, u.refr_medium,
-       u.mkt_medium, u.mkt_source, u.mkt_term, u.mkt_campaign, u.engaged_time_in_s,
+select u.domain_userid, u.first_page_title, u.refr_urlhost, lower(u.refr_medium) as refr_medium,
+       lower(u.mkt_medium) as mkt_medium, u.mkt_source, u.mkt_term, u.mkt_campaign, u.engaged_time_in_s,
        pv.absolute_time_in_s, pv.vertical_percentage_scrolled, pv.geo_country,
        pv.geo_region, pv.br_lang, pv.device_family, pv.os_family,
        ifnull(c.converted, false) as converted_user
@@ -333,14 +333,18 @@ predict_propensity = mlflow.pyfunc.spark_udf(spark, model_path, result_type = St
 
 # COMMAND ----------
 
+# DBTITLE 1,Perform inference
 model_features = predict_propensity.metadata.get_input_schema().input_names()
 
-df = spark.table('snowplow_samples.samples.snowplow_website_users_first_touch_gold').toPandas()
-df = pd.get_dummies(df,columns=['refr_medium','mkt_medium'],dtype='int64')
+users_gold = spark.table('snowplow_samples.samples.snowplow_website_users_first_touch_gold')
+df = pd.get_dummies(users_gold.toPandas(),columns=['refr_medium','mkt_medium'],dtype='int64')
+df = spark.createDataFrame(df)
 
-new_df = spark.table('snowplow_samples.samples.snowplow_website_users_first_touch_gold').select(*model_features)
+new_df = df.withColumn('propensity_prediction', predict_propensity(*model_features))
 
-display(new_df.head())
+# Join the propensity prediction back into our gold user table
+users_gold = users_gold.join(new_df, ['domain_userid'], how='left').select(users_gold, coalesce('users_gold.propensity_prediction', )
+display(new_df.filter(new_df.propensity_prediction == True))
 
 # COMMAND ----------
 

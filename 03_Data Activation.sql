@@ -27,8 +27,6 @@
 -- MAGIC Say our Marketing team want to target two user segments and execute marketing campaigns to accelerate conversion (create new MQLs) and engage new visitors with the product. 
 -- MAGIC # 
 -- MAGIC 1. **Awareness visitors**
--- MAGIC 2. **Engagement visitors**
--- MAGIC 
 -- MAGIC 
 -- MAGIC First we create a parent model based on all our `snowplow_web_users` table for the audiences to be built off of (see [here](https://app.hightouch.com/snowplow-yzw4c/audiences/setup/parent-models/591471)). 
 
@@ -47,8 +45,8 @@
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC ### 3.2.2. Engagement Users
--- MAGIC Create an [Engagement Users](https://app.hightouch.com/snowplow-yzw4c/audiences/591474) audience based on the following rules:
+-- MAGIC ### 3.2.2. Awareness Audience
+-- MAGIC Create an [Awareness Users](https://app.hightouch.com/snowplow-yzw4c/audiences/591474) audience based on the following rules:
 -- MAGIC 
 -- MAGIC - Returned (2 sessions)
 -- MAGIC - Had intent to engage within the last 30 days
