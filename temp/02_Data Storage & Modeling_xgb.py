@@ -159,7 +159,7 @@ from snowplow_samples.dbt_cloud_derived.snowplow_web_users u
 """).toPandas()
 
 ref_cols = ["refr_urlhost", "refr_medium"]
-mkt_cols = ["mkt_medium", "mkt_source", "mkt_term"]
+mkt_cols = ["mkt_medium", "mkt_source", "mkt_term", "mkt_campaign"]
 geo_cols = ["geo_country", "geo_region", "br_lang"]
 dev_cols = ["device_family", "os_family"]
 url_cols = ["first_page_title"]
@@ -184,8 +184,8 @@ df.head()
 # COMMAND ----------
 
 # DBTITLE 1,Create train and test data sets
-# Select features we want to use for the model
 df = spark.table("snowplow_samples.samples.snowplow_website_users_first_touch_gold").toPandas()
+# Select features we want to use for the model
 df = df[["engaged_time_in_s", "absolute_time_in_s", "vertical_percentage_scrolled", "refr_medium", "mkt_medium", "converted_user"]]
 
 df = pd.get_dummies(df,columns=['refr_medium','mkt_medium'],dtype='int64')
@@ -269,6 +269,10 @@ with mlflow.start_run(run_name='XGBClassifier') as run:
     mlflow.log_param(p, argmin[p])
   mlflow.log_metric("avg_precision", trials.best_trial['result']['loss'])
   run_id = run.info.run_id
+
+# COMMAND ----------
+
+print(model.feature_importances_)
 
 # COMMAND ----------
 

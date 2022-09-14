@@ -78,7 +78,7 @@
 # MAGIC 
 # MAGIC Latest version of the DBT Web Package: https://hub.getdbt.com/snowplow/snowplow_web/latest/
 # MAGIC 
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_web_model_dag.png" width="40%">
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_web_model_dag.png" width="30%">
 # MAGIC 
 # MAGIC 
 # MAGIC ### The dbt package will:
@@ -115,16 +115,60 @@
 
 # DBTITLE 1,View page views silver table
 # MAGIC %sql
+# MAGIC select page_view_id,
+# MAGIC        domain_sessionidx,
+# MAGIC        start_tstamp,
+# MAGIC        page_title,
+# MAGIC        page_urlpath,
+# MAGIC        engaged_time_in_s,
+# MAGIC        absolute_time_in_s,
+# MAGIC        vertical_percentage_scrolled,
+# MAGIC        horizontal_percentage_scrolled,
+# MAGIC        mkt_source,
+# MAGIC        mkt_medium,
+# MAGIC        mkt_campaign
+# MAGIC from snowplow_samples.dbt_cloud_derived.snowplow_web_page_views
+# MAGIC where domain_userid = '831e2935bc84857e21b6fe174e43cbef93572038990d323258cc2ca9ad7ce891'
+# MAGIC order by start_tstamp;
 
 # COMMAND ----------
 
 # DBTITLE 1,View sessions silver table
-
+# MAGIC %sql
+# MAGIC select domain_sessionid,
+# MAGIC        start_tstamp,
+# MAGIC        engaged_time_in_s,
+# MAGIC        page_views,
+# MAGIC        first_page_title,
+# MAGIC        last_page_title,
+# MAGIC        mkt_source,
+# MAGIC        mkt_medium,
+# MAGIC        mkt_campaign,
+# MAGIC        geo_country,
+# MAGIC        geo_city,
+# MAGIC        device_family,
+# MAGIC        os_family
+# MAGIC from snowplow_samples.dbt_cloud_derived.snowplow_web_sessions
+# MAGIC where domain_userid = '831e2935bc84857e21b6fe174e43cbef93572038990d323258cc2ca9ad7ce891'
+# MAGIC order by start_tstamp;
 
 # COMMAND ----------
 
 # DBTITLE 1,View users silver table
-
+# MAGIC %sql
+# MAGIC select domain_userid,
+# MAGIC        start_tstamp,
+# MAGIC        end_tstamp,
+# MAGIC        engaged_time_in_s,
+# MAGIC        page_views,
+# MAGIC        sessions,
+# MAGIC        first_page_title,
+# MAGIC        last_page_title,
+# MAGIC        mkt_source,
+# MAGIC        mkt_medium,
+# MAGIC        mkt_campaign
+# MAGIC from dbt_cloud_derived.snowplow_web_users
+# MAGIC where domain_userid = '831e2935bc84857e21b6fe174e43cbef93572038990d323258cc2ca9ad7ce891';
 
 # COMMAND ----------
 
@@ -141,7 +185,7 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Step 4: Use Hightouch for heuristic-driven remarketing
+# MAGIC ### Step 4: Use Hightouch for rule-based remarketing
 
 # COMMAND ----------
 
@@ -162,53 +206,6 @@
 
 # DBTITLE 1,Create model for ___ table
 
-
-# COMMAND ----------
-
-# DBTITLE 1,Create audience segment
-# MAGIC %md
-# MAGIC 
-# MAGIC Create an [Engagement Users](https://app.hightouch.com/snowplow-yzw4c/audiences/591474) audience based on the following rules:
-# MAGIC 
-# MAGIC - Returned (2 sessions)
-# MAGIC - Had intent to engage within the last 30 days
-# MAGIC 
-# MAGIC To flag if a user had intent to engage we see if they had viewed one of the [get-started](https://snowplowanalytics.com/get-started/) pages on Snowplow's website. We can make this an Audience Event using the following query based on our `snowplow_web_page_views` table:
-# MAGIC 
-# MAGIC ```sql
-# MAGIC select 
-# MAGIC   domain_userid,
-# MAGIC   page_view_id,
-# MAGIC   start_tstamp
-# MAGIC from dbt_cloud_derived.snowplow_web_page_views
-# MAGIC where page_urlpath like '/get-started/%'
-# MAGIC ```
-# MAGIC 
-# MAGIC After creating the event (see set up [here](https://app.hightouch.com/snowplow-yzw4c/audiences/setup/events/591234)), we need to add a direct relationship between this and our *All Users* parent model.
-# MAGIC 
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_direct_relationship.png" width="35%">
-# MAGIC 
-# MAGIC We can now use this event as a filter when we build our Engagement Users audience:
-# MAGIC 
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_engagement_users_audience_builder.png" width="35%">
-
-# COMMAND ----------
-
-# DBTITLE 1,Set up destination sync
-# MAGIC %md
-# MAGIC After setting up Braze as a [destination](https://app.hightouch.com/snowplow-yzw4c/destinations) in Hightouch, we can sync up our new audiences. In this case we want to sync these audiences to our *Awareness Users* and *Engagement Users* Braze subscription groups.
-# MAGIC 
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_configure_braze.png" width="40%">
-
-# COMMAND ----------
-
-# DBTITLE 1,Orchestrate an auto-update of audiences
-# MAGIC %md
-# MAGIC It is important that our audiences connected to third party tools like Braze are always up to date and in sync with our Snowplow web data in Databricks. 
-# MAGIC 
-# MAGIC We can ensure this by using the [dbt Cloud extension](https://app.hightouch.com/snowplow-yzw4c/extensions) to trigger syncs after the dbt Snowplow web model job finishes and our Gold tables are updated.
-# MAGIC 
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_dbt_schedule.png" width="30%">
 
 # COMMAND ----------
 
