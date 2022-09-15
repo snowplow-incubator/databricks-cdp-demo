@@ -77,11 +77,7 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_rdb_docs.png" width="60%" style="float: left"/>
-# MAGIC 
-# MAGIC 
-# MAGIC [Setting up Databricks Loader for Snowplow](https://docs.snowplow.io/docs/pipeline-components-and-applications/loaders-storage-targets/snowplow-rdb-loader-3-0-0/loading-transformed-data/databricks-loader) |
-# MAGIC [GIT Repo](https://github.com/snowplow/snowplow-rdb-loader)
+# MAGIC Once your tracking is set up, all events are loaded in real-time using Snowplow's RDB loader into a single atomic events table backed by Databricks’ Delta tables. We call this a “Wide-row Table” – with one row per event, and one column for each type of entity/property and self-describing event.
 
 # COMMAND ----------
 
@@ -127,10 +123,7 @@
 # MAGIC 
 # MAGIC Run `dbt deps` to install the package.
 # MAGIC 
-# MAGIC 
-# MAGIC **Resources:**
-# MAGIC - Check out all Snowplow's DBT packages (for mobile, video, web): https://hub.getdbt.com/snowplow/
-# MAGIC - How to enable DBT for your Databricks project (if not via Partner Connect): https://github.com/databricks/dbt-databricks
+# MAGIC [Snowplow dbt packages](https://hub.getdbt.com/snowplow/) | [Using dbt with Databricks (if not via Partner Connect)](https://github.com/databricks/dbt-databricks)
 
 # COMMAND ----------
 
