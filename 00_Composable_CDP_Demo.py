@@ -34,20 +34,45 @@
 # MAGIC 
 # MAGIC <img src="https://cme-solution-accelerators-images.s3.us-west-2.amazonaws.com/composable-cdp/workflow2.png" width="80%" style="float: right" />
 # MAGIC 
-# MAGIC * **Step 1:** Load atomic event data into Databricks using Snowplow's RDB loader
-# MAGIC * **Step 2:** Create silver tables using Snowplow's DBT package
-# MAGIC * **Step 3:** Perform exploratory data analysis using Databricks SQL
-# MAGIC * **Step 4:** Create gold table for audience segmentation
-# MAGIC * **Step 5:** Use Hightouch for rules-based remarketing
-# MAGIC * **Step 6:** Train propensity to convert model using XGBoost and Mlflow
-# MAGIC * **Step 7:** Use model to predict propensity to convert
-# MAGIC * **Step 8:** Use Hightouch for ML-based remarketing
-# MAGIC * **Step 9:** Monitor campaign performance
+# MAGIC * **Step 1:** Create behavioural event data using Snowplow
+# MAGIC * **Step 2:** Load atomic event data into Databricks using Snowplow's RDB loader
+# MAGIC * **Step 3:** Create silver tables using Snowplow's DBT package
+# MAGIC * **Step 4:** Perform exploratory data analysis using Databricks SQL
+# MAGIC * **Step 5:** Create gold table for audience segmentation
+# MAGIC * **Step 6:** Use Hightouch for rules-based remarketing
+# MAGIC * **Step 7:** Train propensity to convert model using XGBoost and Mlflow
+# MAGIC * **Step 8:** Use model to predict propensity to convert
+# MAGIC * **Step 9:** Use Hightouch for ML-based remarketing
+# MAGIC * **Step 10:** Monitor campaign performance
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Step 1: Load atomic event data into Databricks using Snowplow's RDB loader
+# MAGIC ## Step 1: Create behavioural event data using Snowplow
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC 
+# MAGIC Snowplow is an open-source enterprise data creation platform that enables data collection from multiple products for advanced data analytics and AI/ML solutions. 
+# MAGIC 
+# MAGIC **Snowplow allows you to:** 
+# MAGIC 
+# MAGIC - Create a rich granular behavioural data across your digital platform
+# MAGIC - Define your own version-controlled custom events and entity schema
+# MAGIC - Enchrich the data with various services (pseudonymization, geo, currency exchange, campaign attribution...)
+# MAGIC - Provides flexible identity stitching
+# MAGIC - Control the quality of your data
+# MAGIC - Own your data asset and infrastructure
+# MAGIC 
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_pipeline.png" width="40%" style="float: left"/>
+# MAGIC 
+# MAGIC [Setting up the JavaScript tracker for web](https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/javascript-tracker/web-quick-start-guide/) | [All available enchrichments](https://docs.snowplow.io/docs/enriching-your-data/available-enrichments/)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Step 2: Load atomic event data into Databricks using Snowplow's RDB loader
 
 # COMMAND ----------
 
@@ -67,19 +92,12 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Step 2: Create silver tables using Snowplow's DBT package
+# MAGIC ## Step 3: Create silver tables using Snowplow's DBT package
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC From the query above we can see it is not easy for someone who doesn't know the atomic events table well to get the answers they need from the data. Querying the atomic events table also requires more compute so ends up being more expensive. We need to flatten these columns and aggregate the events into useful, analytics ready tables.
-# MAGIC 
-# MAGIC To do this we can use Snowplow's dbt web package to transform and aggregate the raw web data into a set of derived **Gold** tables straight out of the box:
-# MAGIC * `users`
-# MAGIC * `sessions`
-# MAGIC * `page_views`
-# MAGIC 
-# MAGIC Latest version of the [DBT Web Package](https://hub.getdbt.com/snowplow/snowplow_web/latest/)
+# MAGIC Snowplow's out-of-the-box dbt models aggregate the data to different levels of altitude, so data scientists can directly consume the right altitude for their model. For composable CDP use cases, we're typically making predictions at the user-level. However, it is valuable to be able to drill down into the session, page view and event level, to understand where the user is in their journey and how that is changing over time.
 # MAGIC 
 # MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_web_model_dag.png" width="30%">
 # MAGIC 
@@ -116,6 +134,13 @@
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC ### What does the modelled data actually look like?
+# MAGIC 
+# MAGIC Below is a view of a single user shown through our users, sessions and page views derived tables:
+
+# COMMAND ----------
+
 # DBTITLE 1,View users silver table
 # MAGIC %sql
 # MAGIC select domain_userid, start_tstamp, end_tstamp, engaged_time_in_s, page_views,sessions, first_page_title, last_page_title,mkt_source, mkt_medium, mkt_campaign
@@ -143,7 +168,7 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Step 3: Perform Exploratory Data Analysis using Databricks SQL
+# MAGIC ## Step 4: Perform exploratory data analysis using Databricks SQL
 
 # COMMAND ----------
 
@@ -155,7 +180,7 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Step 4: Create gold table for audience segmentation
+# MAGIC ## Step 5: Create gold table for audience segmentation
 
 # COMMAND ----------
 
@@ -193,7 +218,7 @@ _sqldf.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable("sn
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Step 4: Use Hightouch for rule-based remarketing
+# MAGIC ## Step 5: Use Hightouch for rule-based remarketing
 
 # COMMAND ----------
 
@@ -206,7 +231,7 @@ _sqldf.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable("sn
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Step 5: Train propensity to convert model using XGBoost and MLflow
+# MAGIC ## Step 6: Train propensity to convert model using XGBoost and MLflow
 
 # COMMAND ----------
 
@@ -305,7 +330,7 @@ client.transition_model_version_stage(name = "field_demos_ccdp", version = model
 # COMMAND ----------
 
 # MAGIC %md-sandbox
-# MAGIC ### Step 6: Use model to predict propensity to convert
+# MAGIC ## Step 7: Use model to predict propensity to convert
 # MAGIC 
 # MAGIC Now that our model is built and saved in MLFlow registry, we can load it to run our inferences at scale.
 
@@ -343,7 +368,7 @@ users_gold.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Step 7: Use Hightouch for ML-based remarketing
+# MAGIC ## Step 8: Use Hightouch for ML-based remarketing
 
 # COMMAND ----------
 
@@ -355,7 +380,7 @@ users_gold.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Step 8: Compare campaign performance: Heuristic-driven vs. ML-driven
+# MAGIC ## Step 9: Compare campaign performance: ML vs. Rule Based
 
 # COMMAND ----------
 
