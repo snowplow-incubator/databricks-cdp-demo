@@ -1,7 +1,7 @@
 # Databricks notebook source
 # MAGIC %md
 # MAGIC ## Demo Overview
-# MAGIC * **Background:** Everyday, data practicioners acrsos the globe visit Snowplow's website to learn how the leader in data creation helps organizations create and maintain high quality and privacy-compliant first party data. While some of these visitors request a demo instantly, others remain in the awareness stage of the marketing funnel for some time.
+# MAGIC * **Background:** Everyday, data practitioners across the globe visit Snowplow's website to learn how the leader in data creation helps organizations create and maintain high quality and privacy-compliant first party data. While some of these visitors request a demo instantly, others remain in the awareness stage of the marketing funnel for some time.
 # MAGIC 
 # MAGIC * **Business Objective:** Convert prospects from awareness to engaged users (request for demo).
 # MAGIC 
@@ -36,8 +36,8 @@
 # MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/composable_cdp_new.png" width="50%" style="float: right" />
 # MAGIC 
 # MAGIC Steps
-# MAGIC * **Step 1.** Create of rich behavioural data from testing data product 
-# MAGIC * **Step 2.** Apply enrichments features to enhance the data and select snowplow web dbt package
+# MAGIC * **Step 1.** Create rich compliant behavioural data from testing data product 
+# MAGIC * **Step 2.** Apply advanced tracking with GDPR context and consent and enrichments features to ensure full compliance of the data
 # MAGIC * **Step 3.** Run out-of-the-box DBT web package to model the raw data into AI and BI ready consumption
 # MAGIC * **Step 4.** Select initial features to run the Propensity model and enrich the dataset with the Propensity score
 # MAGIC * **Step 5.** Via Audience builder, select from the table HighPropensity table visitors for *Awareness* and *Engagement* camapaigns
@@ -47,11 +47,12 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Step 1: Load atomic event data into Databricks using Snowplow's RDB loader
+# MAGIC ### Step 1: Create rich behavioural data with Snowplow platform and apply GDPR context. Load atomic event data into Databricks using Snowplow's RDB loader
 
 # COMMAND ----------
 
 # MAGIC %md
+# MAGIC * Apply Consent and GDPR plugins to the out-of-the-box tracking JS:https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/browser-tracker/browser-tracker-v3-reference/tracking-events/#consent-tracking 
 # MAGIC * Setting up Databricks Loader for Snowplow: https://docs.snowplow.io/docs/pipeline-components-and-applications/loaders-storage-targets/snowplow-rdb-loader-3-0-0/loading-transformed-data/databricks-loader
 # MAGIC * GIT Repo: https://github.com/snowplow/snowplow-rdb-loader
 
