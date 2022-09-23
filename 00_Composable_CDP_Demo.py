@@ -34,8 +34,8 @@
 # MAGIC 
 # MAGIC <img src="https://cme-solution-accelerators-images.s3.us-west-2.amazonaws.com/composable-cdp/workflow2.png" width="80%" style="float: right" />
 # MAGIC 
-# MAGIC * **Step 1:** Create behavioural event data using Snowplow
-# MAGIC * **Step 2:** Load atomic event data into Databricks using Snowplow's RDB loader
+# MAGIC * **Step 1:** Create  compliant behavioural data using Snowplow
+# MAGIC * **Step 2:** Apply advanced tracking with GDPR context and consent and enrichments features to ensure full compliance of the data and load data into DeltaLake
 # MAGIC * **Step 3:** Create silver tables using Snowplow's DBT package
 # MAGIC * **Step 4:** Perform exploratory data analysis using Databricks SQL
 # MAGIC * **Step 5:** Create gold table for audience segmentation
