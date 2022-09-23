@@ -55,6 +55,8 @@
 # MAGIC * Apply Consent and GDPR plugins to the out-of-the-box tracking JS:https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/browser-tracker/browser-tracker-v3-reference/tracking-events/#consent-tracking 
 # MAGIC * Setting up Databricks Loader for Snowplow: https://docs.snowplow.io/docs/pipeline-components-and-applications/loaders-storage-targets/snowplow-rdb-loader-3-0-0/loading-transformed-data/databricks-loader
 # MAGIC * GIT Repo: https://github.com/snowplow/snowplow-rdb-loader
+# MAGIC 
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/Snowplow_setup.png" width="80%">
 
 # COMMAND ----------
 
