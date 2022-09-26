@@ -1,5 +1,10 @@
 # Databricks notebook source
-# DBTITLE 1,Demo Overview
+# MAGIC %md
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/logo.png" width="60%">
+
+# COMMAND ----------
+
+# DBTITLE 1,Composable CDP Demo Overview
 # MAGIC %md
 # MAGIC * **Background:** Data practitioners across the globe visit Snowplow's website to learn how the leader in data creation helps organizations create and maintain high quality and privacy-compliant first party data. While some of these visitors request a demo instantly, others remain in the awareness stage of the marketing funnel for some time.
 # MAGIC   * **Business Objective:** Convert prospects from awareness to engaged users (request for demo).
