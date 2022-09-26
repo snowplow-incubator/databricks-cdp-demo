@@ -1,20 +1,11 @@
 -- Databricks notebook source
 -- MAGIC %md
--- MAGIC ## Demo Overview
--- MAGIC * **Background:** Everyday, data practicioners across the globe visit Snowplow's website to learn how the leader in data creation helps organizations create and maintain high quality and privacy-compliant first party data. While some of these visitors request a demo instantly, others remain in the awareness stage of the marketing funnel for some time.
--- MAGIC 
--- MAGIC * **Business Objective:** Convert prospects from awareness to engaged users (request for demo).
--- MAGIC 
--- MAGIC * **Marketing Strategy:** Focus remarketing efforts (and marketing $$) on prospects with a high propensity to convert.
--- MAGIC 
--- MAGIC * **Audience:**
--- MAGIC   * Rules-based segment
--- MAGIC   * ML-based segment
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/logo.png" width="80%">
 
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC ## Introduction of Composable CDP platform
+-- MAGIC ## GDPR compliant Composable CDP platform
 -- MAGIC 
 -- MAGIC The definition of Customer Data Platforms has evolved numerous times since their inception in 2013. Gartner currently defines CDPs as "software application that supports marketing and customer experience use cases by unifying a company's customer data from marketing and other channels. CDPs optimize the timing and targeting of messages, offers and customer engagement activities, and enables the analysis of individual-level customer behavior over time."
 -- MAGIC 
@@ -28,7 +19,7 @@
 -- MAGIC - **Data Activation**: CDPs offer the ability to build audience segments leveraging the data available in the platform. Thanks to a wide-array of pre-built integrations, these audiences and other customer data points are then able to be pushed both to and from various marketing channels.
 -- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/composable_cdp.png" width="60%">
 -- MAGIC 
--- MAGIC In these notebooks we will be exploring behavioural data collected by Snowplow's Javascript tracker from Snowplow's [snowplow.io](https://snowplow.io/) website stored in Databricks. We will then model this data to make it analytics ready using dbt. This dataset can then be used to more effectivley target customers using Hightouch to sync to 3rd party destinations.
+-- MAGIC **Full article:** https://www.databricks.com/blog/2022/06/24/the-emergence-of-the-composable-customer-data-platform.html
 
 -- COMMAND ----------
 
@@ -37,10 +28,15 @@
 -- MAGIC 
 -- MAGIC This solution demonstrates the concept of Composable CDP by using the best-in-class tools for each step of the process. Snowplow platform for getting user behavioural data from your product (visitors), Databricks DeltaLake to store the data, Databricks and MLFlow for training and executing sophisticated ML predictions to determine a likelihood of conversion and Hightouch Activation platform to synchronize the audience segment with marketing tools (like Braze, Salesforce and Facebook Ads) and accelerate their conversion into the qualified leads.
 -- MAGIC 
--- MAGIC **Key facts about the demo set up:**
--- MAGIC - behavioural data created represents visitors of a website from B2B SaaS company with a simple conversion action (ask for demo)
--- MAGIC - The propensity scoring is based on the first touch of user in the product.
--- MAGIC - The output of the demo is 1 table of visitors with high propensity to engage with your product
+-- MAGIC * **Background:** Everyday, data practicioners across the globe visit Snowplow's website to learn how the leader in data creation helps organizations create and maintain high quality and privacy-compliant first party data. While some of these visitors request a demo instantly, others remain in the awareness stage of the marketing funnel for some time.
+-- MAGIC 
+-- MAGIC * **Business Objective:** Convert prospects from awareness to engaged users (request for demo).
+-- MAGIC 
+-- MAGIC * **Marketing Strategy:** Focus remarketing efforts (and marketing $$) on prospects with a high propensity to convert.
+-- MAGIC 
+-- MAGIC * **Audience:**
+-- MAGIC   * Rules-based segment
+-- MAGIC   * ML-based segment
 -- MAGIC 
 -- MAGIC ----------------------------------------------------------------------------------------
 -- MAGIC Now, let's walk through the process of how this was enabled:

@@ -1,6 +1,6 @@
 -- Databricks notebook source
 -- MAGIC %md
--- MAGIC # 1. Data Creation using Snowplow
+-- MAGIC # 1. Data Creation using Snowplow to stay fully compliant with GDPR
 -- MAGIC 
 -- MAGIC Snowplow Analytics is an open-source enterprise data creation platform that enables data collection from multiple products for advanced data analytics and AI/ML solutions. 
 -- MAGIC 
