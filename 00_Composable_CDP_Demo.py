@@ -76,7 +76,7 @@
 # MAGIC 
 # MAGIC 
 # MAGIC 
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_pipeline2.png" width="40%" style="float: left"/>
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_pipeline2.png" width="70%" style="float: left"/>
 # MAGIC 
 # MAGIC [Setting up the JavaScript tracker for web](https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/javascript-tracker/web-quick-start-guide/) | [All available enchrichments](https://docs.snowplow.io/docs/enriching-your-data/available-enrichments/)
 
@@ -86,7 +86,7 @@
 # MAGIC %md
 # MAGIC 
 # MAGIC 
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_gdpr.png" width="80%" style="float: left"/>
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_gdpr.png" width="80%" style="float: center"/>
 
 # COMMAND ----------
 
