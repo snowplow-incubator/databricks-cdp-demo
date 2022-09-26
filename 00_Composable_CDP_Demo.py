@@ -31,6 +31,9 @@
 # MAGIC 
 # MAGIC - **Data Activation**: CDPs offer the ability to build audience segments leveraging the data available in the platform. Thanks to a wide-array of pre-built integrations, these audiences and other customer data points are then able to be pushed both to and from various marketing channels.
 # MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/composable_cdp.png" width="60%">
+# MAGIC 
+# MAGIC 
+# MAGIC **Full article:** https://www.databricks.com/blog/2022/06/24/the-emergence-of-the-composable-customer-data-platform.html
 
 # COMMAND ----------
 
@@ -70,9 +73,19 @@
 # MAGIC - Control the quality of your data
 # MAGIC - Own your data asset and infrastructure
 # MAGIC 
+# MAGIC 
+# MAGIC 
+# MAGIC 
 # MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_pipeline.png" width="40%" style="float: left"/>
 # MAGIC 
 # MAGIC [Setting up the JavaScript tracker for web](https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/javascript-tracker/web-quick-start-guide/) | [All available enchrichments](https://docs.snowplow.io/docs/enriching-your-data/available-enrichments/)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## What makes Snowplow Data GDPR Compliant? 
+# MAGIC 
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_gdpr.png" width="40%" style="float: left"/>
 
 # COMMAND ----------
 
