@@ -45,10 +45,13 @@
 -- MAGIC %md
 -- MAGIC 
 -- MAGIC So let's now dive into how you can create rich behavioural data with Snowplow. 
+-- MAGIC 
+-- MAGIC 
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_pipeline2.png" width="70%" style="float: center"/>
 
 -- COMMAND ----------
 
--- DBTITLE 1,Start tracking events
+-- DBTITLE 1,Snowplow tracking set up
 -- MAGIC %md
 -- MAGIC ### 1.1.1. Start by embedding provided JS snippet into your website. 
 -- MAGIC 
@@ -56,6 +59,8 @@
 -- MAGIC 
 -- MAGIC Copy your JS snippet: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/javascript-tracker/
 -- MAGIC 
+-- MAGIC <br>
+-- MAGIC <br>
 -- MAGIC 
 -- MAGIC ### 1.1.2. Apply additional tracking plugins to add extra context about consent and GDPR context. 
 -- MAGIC 
@@ -78,44 +83,44 @@
 -- MAGIC + Add the GDPR context JS: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/browser-tracker/browser-tracker-v3-reference/tracking-events/#gdpr-context
 -- MAGIC 
 -- MAGIC 
+-- MAGIC 
+-- MAGIC 
+-- MAGIC 
+-- MAGIC 
+-- MAGIC <br>
+-- MAGIC <br>
+-- MAGIC 
+-- MAGIC ### 1.1.3. Apply the following Enrichments of the event data to provide additional business context
+-- MAGIC 
+-- MAGIC Snowplow out-of-the-box enrichments are a powerful way of providing additional context to the data, increase quality as well as being compliant with state legislation such as GDPR and CCPA. Among the most important enrichments you can find powerful **R100 Epidaurus pseudonymisation**, **IAB/ABC International Spiders and Bots detection**, **IP Lookups** or **Event fingerprints**. 
+-- MAGIC 
+-- MAGIC <br>
+-- MAGIC <br>
+-- MAGIC 
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_enrichment.png" width="60%" style="float: center"/>
+-- MAGIC 
+-- MAGIC <br>
+-- MAGIC <br>
+-- MAGIC 
+-- MAGIC ### 1.1.4. The last step is setting up your Databricks Loader to load created data into Lakehouse
+-- MAGIC <br>
+-- MAGIC 
+-- MAGIC - Setting up Databricks Loader for Snowplow: https://docs.snowplow.io/docs/pipeline-components-and-applications/loaders-storage-targets/snowplow-rdb-loader-3-0-0/loading-transformed-data/databricks-loader
+-- MAGIC - GIT Repo: https://github.com/snowplow/snowplow-rdb-loader
+-- MAGIC 
+-- MAGIC <br>
+-- MAGIC <br>
+-- MAGIC 
 -- MAGIC **Resources:**
+-- MAGIC - The list of all available enchrichments: https://docs.snowplow.io/docs/enriching-your-data/available-enrichments/**Resources:**
 -- MAGIC - What is tracking event? https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/browser-tracker/browser-tracker-v3-reference/tracking-events
 -- MAGIC - How to set up a JavaScript tracker to my Web Product: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/javascript-tracker/web-quick-start-guide/
 -- MAGIC - How to set up a Mobile tracker for my MobileApp: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/mobile-trackers/installation-and-set-up/
 -- MAGIC - All additional supported tracking methods - https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/snowplow-tracker-protocol/
--- MAGIC 
--- MAGIC 
--- MAGIC 
--- MAGIC 
--- MAGIC 
--- MAGIC 
--- MAGIC ### 1.1.2. Apply the following Enrichments write data into atomic.events table. 
--- MAGIC 
--- MAGIC - PII Pseudonymization
--- MAGIC - IP lookups 
--- MAGIC - Campaign attribution
--- MAGIC - referer-parser enrichment
--- MAGIC - IAB
--- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_enrichment.png" width="40%" style="float: center"/>
--- MAGIC 
--- MAGIC 
--- MAGIC **Resources:**
--- MAGIC - The list of all available enchrichments: https://docs.snowplow.io/docs/enriching-your-data/available-enrichments/
-
--- COMMAND ----------
-
--- DBTITLE 1,Apply Snowplow enrichments in stream
--- MAGIC %md
 
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC ## 1.2 Set your Databricks Loader
--- MAGIC 
--- MAGIC 
--- MAGIC - Setting up Databricks Loader for Snowplow: https://docs.snowplow.io/docs/pipeline-components-and-applications/loaders-storage-targets/snowplow-rdb-loader-3-0-0/loading-transformed-data/databricks-loader
--- MAGIC - GIT Repo: https://github.com/snowplow/snowplow-rdb-loader
 -- MAGIC 
 -- MAGIC 
 -- MAGIC Snowplow's data use **RECAP** framework to help customers create right data with the right quality:
