@@ -133,6 +133,7 @@ from xgboost import XGBClassifier
 from pyspark.sql.functions import col
 from pyspark.sql.types import DoubleType, StringType
 from hyperopt.pyll.base import scope
+import pyspark.sql.functions as f 
 
 # COMMAND ----------
 
@@ -152,7 +153,8 @@ select u.domain_userid, u.first_page_title, u.refr_urlhost, lower(u.refr_medium)
        lower(u.mkt_medium) as mkt_medium, u.mkt_source, u.mkt_term, u.mkt_campaign, u.engaged_time_in_s,
        pv.absolute_time_in_s, pv.vertical_percentage_scrolled, pv.geo_country,
        pv.geo_region, pv.br_lang, pv.device_family, pv.os_family,
-       ifnull(c.converted, false) as converted_user
+       ifnull(c.converted, false) as converted_user,
+       'N/A' as propensity_prediction
 from snowplow_samples.dbt_cloud_derived.snowplow_web_users u
      join pv on u.domain_userid = pv.domain_userid and pv.rn = 1
      left join snowplow_samples.samples.converted_users c using(domain_userid)
@@ -177,7 +179,7 @@ for col in continues_col:
     df[col].fillna(df[col].mean(), inplace=True)
 
 df_spark = spark.createDataFrame(df)
-df_spark.write.mode("overwrite").saveAsTable("snowplow_samples.samples.snowplow_website_users_first_touch_gold")    
+df_spark.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable("snowplow_samples.samples.snowplow_website_users_first_touch_gold") 
     
 df.head()
 
@@ -340,11 +342,15 @@ users_gold = spark.table('snowplow_samples.samples.snowplow_website_users_first_
 df = pd.get_dummies(users_gold.toPandas(),columns=['refr_medium','mkt_medium'],dtype='int64')
 df = spark.createDataFrame(df)
 
-new_df = df.withColumn('propensity_prediction', predict_propensity(*model_features))
+predictions = df.withColumn('propensity_prediction', predict_propensity(*model_features))
 
 # Join the propensity prediction back into our gold user table
-users_gold = users_gold.join(new_df, ['domain_userid'], how='left').select(users_gold, coalesce('users_gold.propensity_prediction', )
-display(new_df.filter(new_df.propensity_prediction == True))
+user_cols = list(users_gold.columns[:-1])
+user_cols = ['u.' + col for col in user_cols]
+users_gold = users_gold.alias('u').join(predictions.alias('p'), ['domain_userid'], how='left').select(*user_cols, f.coalesce('p.propensity_prediction', 'u.propensity_prediction').alias('propensity_prediction'))
+users_gold.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable("snowplow_samples.samples.snowplow_website_users_first_touch_gold") 
+
+display(users_gold.filter(users_gold.propensity_prediction == True))
 
 # COMMAND ----------
 

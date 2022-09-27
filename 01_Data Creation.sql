@@ -29,6 +29,14 @@
 
 -- COMMAND ----------
 
+-- DBTITLE 1,What makes Snowplow data GDPR compliant? 
+-- MAGIC %md
+-- MAGIC 
+-- MAGIC 
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/Snowplow_gdpr.png" width="900%" style="float: center"/>
+
+-- COMMAND ----------
+
 -- MAGIC %md
 -- MAGIC ## 1.1 Creating the data
 
@@ -60,15 +68,19 @@
 
 -- COMMAND ----------
 
+-- DBTITLE 1,Apply additional tracking plugins to collect GDPR context
 -- MAGIC %md
--- MAGIC And now let's see how the atomic data looks like: 
 -- MAGIC 
--- MAGIC - all events, entities stitched from multiple sources into one simple table
--- MAGIC - during enrichment the events have extra properties and values attached to them, also know as dimension widening.
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_consent.png" width="100%" style="float: center"/>
+
+-- COMMAND ----------
+
+-- DBTITLE 1,Apply Snowplow enrichments in stream
+-- MAGIC %md
+-- MAGIC 
 -- MAGIC 
 -- MAGIC **The following Enrichments write data into atomic.events table:**
 -- MAGIC 
--- MAGIC - IP anonymization
 -- MAGIC - PII Pseudonymization
 -- MAGIC - IP lookups 
 -- MAGIC - Campaign attribution
