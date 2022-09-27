@@ -44,7 +44,14 @@
 
 -- MAGIC %md
 -- MAGIC 
--- MAGIC So let's now dive into how the data created by Snowplow platform looks like, what are the main figures, number of events and unique users entering the demo website. 
+-- MAGIC So let's now dive into how you create the data with Snowplow. 
+
+-- COMMAND ----------
+
+-- DBTITLE 1,Start tracking events
+-- MAGIC %md
+-- MAGIC 
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_tracking.png" width="100%" style="float: center"/>
 
 -- COMMAND ----------
 
