@@ -44,14 +44,38 @@
 
 -- MAGIC %md
 -- MAGIC 
--- MAGIC So let's now dive into how you create the data with Snowplow. 
+-- MAGIC So let's now dive into how you can create rich behavioural data with Snowplow. 
 
 -- COMMAND ----------
 
 -- DBTITLE 1,Start tracking events
 -- MAGIC %md
+-- MAGIC - Start by embedding provided JS snippet into your website / product. 
 -- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_tracking.png" width="100%" style="float: center"/>
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_tracking.png" width="50%" style="float: center"/>
+-- MAGIC 
+-- MAGIC 
+-- MAGIC - Apply additional tracking plugins to add extra context about consent and GDPR context. 
+-- MAGIC 
+-- MAGIC %md
+-- MAGIC 
+-- MAGIC Use the **trackConsentGranted** method to track a user opting into data collection. A consent document context will be attached to the event if at least the id and version arguments are supplied. The method arguments are:
+-- MAGIC 
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_consent.png" width="40%" style="float: center"/>
+-- MAGIC 
+-- MAGIC 
+-- MAGIC The required basisForProcessing accepts only the following literals: consent, contract, legalObligation, vitalInterests, publicTask, legitimateInterests - in accordance with the five legal bases for processing
+-- MAGIC 
+-- MAGIC The GDPR context is enabled by calling the enableGdprContext method once the tracker has been initialised: 
+-- MAGIC 
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_context.png" width="40%" style="float: center"/>
+-- MAGIC 
+-- MAGIC 
+-- MAGIC **Resources:**
+-- MAGIC - What is tracking event? https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/browser-tracker/browser-tracker-v3-reference/tracking-events
+-- MAGIC - How to set up a JavaScript tracker to my Web Product: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/javascript-tracker/web-quick-start-guide/
+-- MAGIC - How to set up a Mobile tracker for my MobileApp: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/mobile-trackers/installation-and-set-up/
+-- MAGIC - All additional supported tracking methods - https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/snowplow-tracker-protocol/
 
 -- COMMAND ----------
 
@@ -75,22 +99,6 @@
 
 -- COMMAND ----------
 
--- DBTITLE 1,Apply additional tracking plugins to collect GDPR context
--- MAGIC %md
--- MAGIC 
--- MAGIC Use the **trackConsentGranted** method to track a user opting into data collection. A consent document context will be attached to the event if at least the id and version arguments are supplied. The method arguments are:
--- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_consent.png" width="40%" style="float: center"/>
--- MAGIC 
--- MAGIC 
--- MAGIC The required basisForProcessing accepts only the following literals: consent, contract, legalObligation, vitalInterests, publicTask, legitimateInterests - in accordance with the five legal bases for processing
--- MAGIC 
--- MAGIC The GDPR context is enabled by calling the enableGdprContext method once the tracker has been initialised: 
--- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_context.png" width="40%" style="float: center"/>
-
--- COMMAND ----------
-
 -- DBTITLE 1,Apply Snowplow enrichments in stream
 -- MAGIC %md
 -- MAGIC 
@@ -106,10 +114,6 @@
 -- MAGIC 
 -- MAGIC **Resources:**
 -- MAGIC - The list of all available enchrichments: https://docs.snowplow.io/docs/enriching-your-data/available-enrichments/
--- MAGIC - What is tracking event? https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/browser-tracker/browser-tracker-v3-reference/tracking-events
--- MAGIC - How to set up a JavaScript tracker to my Web Product: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/javascript-tracker/web-quick-start-guide/
--- MAGIC - How to set up a Mobile tracker for my MobileApp: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/mobile-trackers/installation-and-set-up/
--- MAGIC - All additional supported tracking methods - https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/snowplow-tracker-protocol/
 
 -- COMMAND ----------
 
