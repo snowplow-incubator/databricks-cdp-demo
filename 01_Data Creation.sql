@@ -71,7 +71,16 @@
 -- DBTITLE 1,Apply additional tracking plugins to collect GDPR context
 -- MAGIC %md
 -- MAGIC 
--- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_consent.png" width="100%" style="float: center"/>
+-- MAGIC Use the **trackConsentGranted** method to track a user opting into data collection. A consent document context will be attached to the event if at least the id and version arguments are supplied. The method arguments are:
+-- MAGIC 
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_consent.png" width="40%" style="float: center"/>
+-- MAGIC 
+-- MAGIC 
+-- MAGIC The required basisForProcessing accepts only the following literals: consent, contract, legalObligation, vitalInterests, publicTask, legitimateInterests - in accordance with the five legal bases for processing
+-- MAGIC 
+-- MAGIC The GDPR context is enabled by calling the enableGdprContext method once the tracker has been initialised: 
+-- MAGIC 
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_context.png" width="40%" style="float: center"/>
 
 -- COMMAND ----------
 
