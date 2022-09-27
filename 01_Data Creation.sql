@@ -50,25 +50,32 @@
 
 -- DBTITLE 1,Start tracking events
 -- MAGIC %md
--- MAGIC - Start by embedding provided JS snippet into your website / product. 
+-- MAGIC ### 1.1.1. Start by embedding provided JS snippet into your website. 
 -- MAGIC 
 -- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_tracking.png" width="50%" style="float: center"/>
 -- MAGIC 
+-- MAGIC Copy your JS snippet: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/javascript-tracker/
 -- MAGIC 
--- MAGIC - Apply additional tracking plugins to add extra context about consent and GDPR context. 
 -- MAGIC 
--- MAGIC %md
+-- MAGIC ### 1.1.2. Apply additional tracking plugins to add extra context about consent and GDPR context. 
+-- MAGIC 
+-- MAGIC 
+-- MAGIC 
 -- MAGIC 
 -- MAGIC Use the **trackConsentGranted** method to track a user opting into data collection. A consent document context will be attached to the event if at least the id and version arguments are supplied. The method arguments are:
 -- MAGIC 
 -- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_consent.png" width="40%" style="float: center"/>
 -- MAGIC 
+-- MAGIC + Add the consent JS: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/browser-tracker/browser-tracker-v3-reference/tracking-events/#consent-documents
 -- MAGIC 
--- MAGIC The required basisForProcessing accepts only the following literals: consent, contract, legalObligation, vitalInterests, publicTask, legitimateInterests - in accordance with the five legal bases for processing
 -- MAGIC 
--- MAGIC The GDPR context is enabled by calling the enableGdprContext method once the tracker has been initialised: 
+-- MAGIC The required **basisForProcessing** accepts only the following literals: consent, contract, legalObligation, vitalInterests, publicTask, legitimateInterests - in accordance with the five legal bases for processing
+-- MAGIC 
+-- MAGIC The GDPR context is enabled by calling the **enableGdprContext** method once the tracker has been initialised: 
 -- MAGIC 
 -- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_context.png" width="40%" style="float: center"/>
+-- MAGIC 
+-- MAGIC + Add the GDPR context JS: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/browser-tracker/browser-tracker-v3-reference/tracking-events/#gdpr-context
 -- MAGIC 
 -- MAGIC 
 -- MAGIC **Resources:**
@@ -76,34 +83,13 @@
 -- MAGIC - How to set up a JavaScript tracker to my Web Product: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/javascript-tracker/web-quick-start-guide/
 -- MAGIC - How to set up a Mobile tracker for my MobileApp: https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/mobile-trackers/installation-and-set-up/
 -- MAGIC - All additional supported tracking methods - https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/snowplow-tracker-protocol/
-
--- COMMAND ----------
-
--- MAGIC %py
--- MAGIC import plotly.express as px
--- MAGIC 
--- MAGIC df = spark.sql(
--- MAGIC """
--- MAGIC select date(collector_tstamp) as Date, count(distinct domain_userid) as users, count(*) as events
--- MAGIC from snowplow_samples.snowplow.events 
--- MAGIC where app_id = 'website'
--- MAGIC group by 1
--- MAGIC order by 1
--- MAGIC """
--- MAGIC ).toPandas()
--- MAGIC 
--- MAGIC fig = px.bar(df, x="Date", y=["users", "events"], barmode='group',
--- MAGIC              labels={"variable": "Count"},
--- MAGIC              title='Unique Users and Events over Time')
--- MAGIC fig.show()
-
--- COMMAND ----------
-
--- DBTITLE 1,Apply Snowplow enrichments in stream
--- MAGIC %md
 -- MAGIC 
 -- MAGIC 
--- MAGIC **The following Enrichments write data into atomic.events table:**
+-- MAGIC 
+-- MAGIC 
+-- MAGIC 
+-- MAGIC 
+-- MAGIC ### 1.1.2. Apply the following Enrichments write data into atomic.events table. 
 -- MAGIC 
 -- MAGIC - PII Pseudonymization
 -- MAGIC - IP lookups 
@@ -111,9 +97,16 @@
 -- MAGIC - referer-parser enrichment
 -- MAGIC - IAB
 -- MAGIC 
+-- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_enrichment.png" width="40%" style="float: center"/>
+-- MAGIC 
 -- MAGIC 
 -- MAGIC **Resources:**
 -- MAGIC - The list of all available enchrichments: https://docs.snowplow.io/docs/enriching-your-data/available-enrichments/
+
+-- COMMAND ----------
+
+-- DBTITLE 1,Apply Snowplow enrichments in stream
+-- MAGIC %md
 
 -- COMMAND ----------
 
@@ -147,6 +140,26 @@
 -- MAGIC ## 1.3 Start exploring the data from atomic (BRONZE) table
 -- MAGIC 
 -- MAGIC Even the most granular (atomic) data are very valuable for initial analysis of the data. Getting number of unique users, where the users are coming from, which campaigns etc... 
+
+-- COMMAND ----------
+
+-- MAGIC %py
+-- MAGIC import plotly.express as px
+-- MAGIC 
+-- MAGIC df = spark.sql(
+-- MAGIC """
+-- MAGIC select date(collector_tstamp) as Date, count(distinct domain_userid) as users, count(*) as events
+-- MAGIC from snowplow_samples.snowplow.events 
+-- MAGIC where app_id = 'website'
+-- MAGIC group by 1
+-- MAGIC order by 1
+-- MAGIC """
+-- MAGIC ).toPandas()
+-- MAGIC 
+-- MAGIC fig = px.bar(df, x="Date", y=["users", "events"], barmode='group',
+-- MAGIC              labels={"variable": "Count"},
+-- MAGIC              title='Unique Users and Events over Time')
+-- MAGIC fig.show()
 
 -- COMMAND ----------
 
