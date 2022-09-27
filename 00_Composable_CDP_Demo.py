@@ -86,7 +86,7 @@
 # MAGIC %md
 # MAGIC 
 # MAGIC 
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_gdpr.png" width="80%" style="float: center"/>
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/Snowplow_gdpr.png" width="900%" style="float: center"/>
 
 # COMMAND ----------
 
