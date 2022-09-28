@@ -8,7 +8,7 @@
 # MAGIC %md
 # MAGIC * **Background:** Data practitioners across the globe visit Snowplow's website to learn how the leader in data creation helps organizations create and maintain high quality and privacy-compliant first party data. While some of these visitors request a demo instantly, others remain in the awareness stage of the marketing funnel for some time.
 # MAGIC   * **Business Objective:** Convert prospects from awareness to engaged users (request for demo).
-# MAGIC   * **Marketing Strategy:** Focus remarketing efforts on prospects with a hight propensity to convert.
+# MAGIC   * **Marketing Strategy:** Focus remarketing efforts on prospects with highest propensity to convert.
 # MAGIC   * **Audience Segmentation:** Rules-based audience segment and ML-based audience segment
 # MAGIC 
 # MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/ad_campaign_dashboard.png" width="70%" style="float:right"/>

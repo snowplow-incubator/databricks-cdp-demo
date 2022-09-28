@@ -142,7 +142,7 @@
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC ## 1.3 Start exploring the data from atomic (BRONZE) table
+-- MAGIC ## 1.3. Start exploring the data from atomic (BRONZE) table
 -- MAGIC 
 -- MAGIC Even the most granular (atomic) data are very valuable for initial analysis of the data. Getting number of unique users, where the users are coming from, which campaigns etc... 
 
