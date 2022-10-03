@@ -150,12 +150,12 @@ display(df)
 # MAGIC %md
 # MAGIC ## 2.4.4. Train model using XGBoost and MLflow
 # MAGIC 
-# MAGIC Here we have just selected a few of the features Snowplow behavioural data has to offer. You'd extend this with more and more columns as you start using ML to predict more and more types of user behavior, building out a richer view of each of your customers / users. 
+# MAGIC Here we have just selected a few of the features Snowplow behavioural data has to offer to train our model. You'd extend this with more and more columns as you start using ML to predict more and more types of user behavior, building out a richer view of each of your customers / users. 
 
 # COMMAND ----------
 
 # DBTITLE 1,Create train and test data sets
-df = spark.table("snowplow_samples.samples.snowplow_website_users_first_touch_gold").drop('propensity_prediction').toPandas()
+df = spark.table("snowplow_samples.samples.snowplow_website_users_first_touch_gold").toPandas()
 # Select columns we want to use for the model from our Gold user table
 df = df[["engaged_time_in_s", "absolute_time_in_s", "vertical_percentage_scrolled", "refr_medium", "mkt_medium", "converted_user"]]
 df = pd.get_dummies(df,columns=['refr_medium','mkt_medium'],dtype='int64')
@@ -167,7 +167,8 @@ X_train, X_test, y_train, y_test = train_test_split(df[features], df["converted_
 # DBTITLE 1,Define model evaluation for hyperopt
 def evaluate_model(params):
   #instantiate model
-  model = XGBClassifier(learning_rate=params["learning_rate"],
+  model = XGBClassifier(use_label_encoder=False,
+                            learning_rate=params["learning_rate"],
                             gamma=int(params["gamma"]),
                             reg_alpha=int(params["reg_alpha"]),
                             reg_lambda=int(params["reg_lambda"]),
