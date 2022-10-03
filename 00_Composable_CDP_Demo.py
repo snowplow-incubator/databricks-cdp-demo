@@ -198,34 +198,31 @@
 
 # DBTITLE 1,Construct gold table
 # MAGIC %sql 
+# MAGIC CREATE OR REPLACE TEMPORARY VIEW gold_view AS (
+# MAGIC   WITH pv AS (
+# MAGIC     SELECT domain_userid, absolute_time_in_s, vertical_percentage_scrolled, geo_country, geo_region, br_lang, 
+# MAGIC     device_family, os_family, row_number() OVER (PARTITION BY domain_userid ORDER BY start_tstamp) AS rn
+# MAGIC     FROM snowplow_samples.dbt_cloud_derived.snowplow_web_page_views
+# MAGIC     WHERE page_view_in_session_index = 1 qualify rn = 1)
 # MAGIC 
-# MAGIC WITH pv AS (
-# MAGIC   SELECT domain_userid, absolute_time_in_s, vertical_percentage_scrolled, geo_country, geo_region, br_lang, device_family, os_family,
-# MAGIC     row_number() OVER (PARTITION BY domain_userid ORDER BY start_tstamp) AS rn
-# MAGIC   FROM snowplow_samples.dbt_cloud_derived.snowplow_web_page_views
-# MAGIC   WHERE page_view_in_session_index = 1 qualify rn = 1
-# MAGIC )
 # MAGIC 
-# MAGIC SELECT
-# MAGIC   u.domain_userid, u.first_page_title, u.refr_urlhost, lower(u.refr_medium) as refr_medium, lower(u.mkt_medium) as mkt_medium, 
-# MAGIC   u.mkt_source, u.mkt_term, u.mkt_campaign, u.engaged_time_in_s, u.sessions, u.page_views,
-# MAGIC   pv.absolute_time_in_s, pv.vertical_percentage_scrolled, pv.geo_country, pv.geo_region, pv.br_lang, pv.device_family, pv.os_family,
-# MAGIC   ifnull(c.converted, false) as converted_user,
-# MAGIC   0.00 as propensity_prediction -- to be populated by our ML model later
-# MAGIC FROM
-# MAGIC   snowplow_samples.dbt_cloud_derived.snowplow_web_users u
+# MAGIC   SELECT u.domain_userid, u.first_page_title, u.refr_urlhost, lower(u.refr_medium) as refr_medium,
+# MAGIC   lower(u.mkt_medium) as mkt_medium, u.mkt_source, u.mkt_term, u.mkt_campaign, u.engaged_time_in_s, 
+# MAGIC   u.sessions, u.page_views, pv.absolute_time_in_s, pv.vertical_percentage_scrolled, pv.geo_country,
+# MAGIC   pv.geo_region, pv.br_lang, pv.device_family, pv.os_family, int(ifnull(c.converted, false)) as converted_user
+# MAGIC   FROM snowplow_samples.dbt_cloud_derived.snowplow_web_users u
 # MAGIC   JOIN pv ON u.domain_userid = pv.domain_userid
 # MAGIC   AND pv.rn = 1
-# MAGIC   LEFT JOIN snowplow_samples.samples.converted_users c USING(domain_userid)
+# MAGIC   LEFT JOIN snowplow_samples.samples.converted_users c USING(domain_userid))
 
 # COMMAND ----------
 
-df = _sqldf.na.fill(0)
+df = spark.sql("select * from gold_view").na.fill(0)
 
 # COMMAND ----------
 
 # DBTITLE 1,Persist gold table
-_sqldf.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable("snowplow_samples.samples.snowplow_website_users_first_touch_gold")
+df.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable("snowplow_samples.samples.snowplow_website_users_first_touch_gold")
 
 # COMMAND ----------
 
@@ -254,7 +251,7 @@ import pandas as pd
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import RepeatedStratifiedKFold
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import average_precision_score
+from sklearn.metrics import average_precision_score, f1_score
 from hyperopt import fmin, tpe, rand, hp, Trials, STATUS_OK, SparkTrials, space_eval
 from mlflow.models.signature import infer_signature
 from xgboost import XGBClassifier
@@ -269,7 +266,7 @@ df = spark.table("snowplow_samples.samples.snowplow_website_users_first_touch_go
 # Select columns we want to use for the model from our Gold user table
 df = df[["engaged_time_in_s", "absolute_time_in_s", "vertical_percentage_scrolled", "refr_medium", "mkt_medium", "converted_user"]]
 df = pd.get_dummies(df,columns=['refr_medium','mkt_medium'],dtype='int64')
-features = list(df.columns[:-1])
+features = [i for i in list(df.columns) if i != 'converted_user']
 X_train, X_test, y_train, y_test = train_test_split(df[features], df["converted_user"], test_size=0.33, random_state=55)
 
 # COMMAND ----------
@@ -277,7 +274,7 @@ X_train, X_test, y_train, y_test = train_test_split(df[features], df["converted_
 # DBTITLE 1,Define model evaluation for hyperopt
 def evaluate_model(params):
   #instantiate model
-  model = XGBClassifier(learning_rate=params["learning_rate"],
+  model = XGBClassifier(use_label_encoder=False,learning_rate=params["learning_rate"],
                             gamma=int(params["gamma"]),
                             reg_alpha=int(params["reg_alpha"]),
                             reg_lambda=int(params["reg_lambda"]),
@@ -290,13 +287,17 @@ def evaluate_model(params):
   
   #predict
   y_prob = model.predict_proba(X_test)
+  y_pred = model.predict(X_test)
   
   #score
   precision = average_precision_score(y_test, y_prob[:,1])
+  f1 = f1_score(y_test, y_pred)
+    
   mlflow.log_metric('avg_precision', precision)  # record actual metric with mlflow run
+  mlflow.log_metric('avg_f1', f1)  # record actual metric with mlflow run
   
   # return results (negative precision as we minimize the function)
-  return {'loss': -precision, 'status': STATUS_OK, 'model': model}
+  return {'loss': -f1, 'status': STATUS_OK, 'model': model}
 
 # COMMAND ----------
 
@@ -319,12 +320,12 @@ with mlflow.start_run(run_name='XGBClassifier') as run:
   argmin = fmin(fn=evaluate_model, space=search_space, algo=tpe.suggest, max_evals=20, trials=trials)
   #log the best model information
   model = trials.best_trial['result']['model']
-  signature = infer_signature(X_test, model.predict_proba(X_test))
+  signature = infer_signature(X_test, model.predict(X_test))
   mlflow.sklearn.log_model(trials.best_trial['result']['model'], 'model', signature=signature, input_example=X_test.iloc[0].to_dict())
   #add hyperopt model params
   for p in argmin:
     mlflow.log_param(p, argmin[p])
-  mlflow.log_metric("avg_precision", trials.best_trial['result']['loss'])
+  mlflow.log_metric("avg_f1_score", trials.best_trial['result']['loss'])
   run_id = run.info.run_id
 
 # COMMAND ----------
@@ -353,7 +354,7 @@ client.transition_model_version_stage(name = "field_demos_ccdp", version = model
 #                       Model name       |
 #                           |            |
 model_path = 'models:/field_demos_ccdp/Production'
-predict_propensity = mlflow.pyfunc.spark_udf(spark, model_path, result_type='string')
+predict_propensity = mlflow.pyfunc.spark_udf(spark, model_path, result_type='double')
 
 
 # COMMAND ----------
@@ -370,12 +371,13 @@ display(predictions.filter(predictions.propensity_prediction == True))
 
 # COMMAND ----------
 
-# DBTITLE 1,Save propensity to convert predictions
-# Join the propensity prediction back into our gold user table
-user_cols = list(users_gold.columns[:-1])
-user_cols = ['u.' + col for col in user_cols]
-users_gold = users_gold.alias('u').join(predictions.alias('p'), ['domain_userid'], how='left').select(*user_cols, coalesce('p.propensity_prediction', 'u.propensity_prediction').alias('propensity_prediction'))
-users_gold.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable("snowplow_samples.samples.snowplow_website_users_first_touch_gold") 
+display(predictions.groupBy('propensity_prediction').count())
+
+# COMMAND ----------
+
+# DBTITLE 1,Save high propensity to convert website visitors
+high_propensity_web_users = predictions.select('domain_userid', 'propensity_prediction').where(predictions.propensity_prediction == 1)
+high_propensity_web_users.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable("snowplow_samples.samples.high_propensity_web_users") 
 
 # COMMAND ----------
 
