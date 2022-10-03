@@ -25,9 +25,7 @@
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC ## 3.2. Create the audience cohort
--- MAGIC 
--- MAGIC Say our Marketing team want to target two user segments and execute marketing campaigns to accelerate conversion (create new MQLs) and engage new visitors with the product. 
+-- MAGIC ## 3.2. Build audiences
 
 -- COMMAND ----------
 
@@ -40,7 +38,7 @@
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC ### 3.2.2. Audience Builder
+-- MAGIC ### 3.2.2. Audience query
 -- MAGIC Now we can build an audience using columns from our parent model. In this example we are targetting high propensity users in the awareness stage based on the following criteria:
 -- MAGIC * First time on website
 -- MAGIC * Did not arrive from a marketing campaign
@@ -82,9 +80,9 @@
 -- COMMAND ----------
 
 -- MAGIC %md
--- MAGIC ## 3.3. Sync the created Audiences with Marketing channels
+-- MAGIC ## 3.3. Sync audiences to your marketing tools
 -- MAGIC 
--- MAGIC After setting up your required [destinations](https://hightouch.com/integrations) in Hightouch you can sync up your new audiences. 
+-- MAGIC After setting up your required [destinations](https://hightouch.com/integrations) (115+ integrations to choose from), you can sync up your new audience.
 -- MAGIC 
 -- MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_syncs.png" width="30%">
 
