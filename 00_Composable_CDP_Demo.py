@@ -270,10 +270,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import average_precision_score, f1_score
 from hyperopt import fmin, tpe, rand, hp, Trials, STATUS_OK, SparkTrials, space_eval
 from mlflow.models.signature import infer_signature
-from xgboost import XGBClassifier
+from xgboost import XGBClassifier, plot_importance
 from pyspark.sql.functions import col, struct, coalesce
 from pyspark.sql.types import DoubleType, StringType
 from hyperopt.pyll.base import scope
+from matplotlib import pyplot
 
 # COMMAND ----------
 
@@ -343,6 +344,12 @@ with mlflow.start_run(run_name='XGBClassifier') as run:
     mlflow.log_param(p, argmin[p])
   mlflow.log_metric("avg_f1_score", trials.best_trial['result']['loss'])
   run_id = run.info.run_id
+
+# COMMAND ----------
+
+# DBTITLE 1,Feature importance
+plot_importance(model)
+pyplot.show()
 
 # COMMAND ----------
 
