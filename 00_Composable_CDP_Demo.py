@@ -73,10 +73,9 @@
 # MAGIC - Control the quality of your data
 # MAGIC - Own your data asset and infrastructure
 # MAGIC 
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_BDP.png" width="60%">
 # MAGIC 
 # MAGIC 
-# MAGIC 
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_pipeline2.png" width="70%" style="float: left"/>
 # MAGIC 
 # MAGIC [Setting up the JavaScript tracker for web](https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/javascript-tracker/web-quick-start-guide/) | [All available enchrichments](https://docs.snowplow.io/docs/enriching-your-data/available-enrichments/)
 
@@ -97,6 +96,23 @@
 
 # MAGIC %md
 # MAGIC Once your tracking is set up, all events are loaded in real-time using Snowplow's RDB loader into a single atomic events table backed by Databricks’ Delta tables. We call this a “Wide-row Table” – with one row per event, and one column for each type of entity/property and self-describing event.
+# MAGIC 
+# MAGIC 
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_pipeline2.png" width="60%" style="float: left"/>
+# MAGIC 
+# MAGIC **In the single schema table you get:**
+# MAGIC 
+# MAGIC <br>
+# MAGIC 
+# MAGIC - **All events from multiple sources** (web, app, mobile, server)
+# MAGIC - **Pseudonymised IP address**
+# MAGIC - **Consent information** (granted, withdrawn), consent basis, GDPR context (privacy policy, expiry date, description, URL)
+# MAGIC - **Multiple User IDs stitched together** (domain_userID, network_user_ID, event_id, user_ID, domain_session_ID, domain_user_ID)
+# MAGIC - **Geocoding information** (country, region, city, zipcode, latitude, longtitude, IP organisation)
+# MAGIC - **Referrer**, source, medium
+# MAGIC - **Marketing campaign**, source, medium, 
+# MAGIC - **Device information** (browser, language, type, OS version, family, JS, timezone, screen resolution...)
+# MAGIC - **Behavioural metrics** (engaged time, total time, vertical scroll percentage)
 
 # COMMAND ----------
 
