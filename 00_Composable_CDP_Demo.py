@@ -347,7 +347,19 @@ with mlflow.start_run(run_name='XGBClassifier') as run:
 
 # COMMAND ----------
 
-# DBTITLE 1,Feature importance
+# DBTITLE 1,Feature importance for the model performance
+We can see the importance of the engagement metrics in predicting conversion. 
+
+The presence of user behavioural metrics like 
+ - Vertical Scrolling (on the pages)
+ - Engaged time (on the pages)
+ - Absolute time (spent on the website) 
+ 
+ support the model performance from 40%
+
+
+
+
 plot_importance(model)
 pyplot.show()
 
