@@ -43,7 +43,7 @@
 # MAGIC <img src="https://cme-solution-accelerators-images.s3.us-west-2.amazonaws.com/composable-cdp/workflow2.png" width="80%" style="float: right" />
 # MAGIC 
 # MAGIC * **Step 1:** Create  compliant behavioural data using Snowplow
-# MAGIC * **Step 2:** Apply advanced tracking with GDPR context and consent and enrichments features to ensure full compliance of the data and load data into DeltaLake
+# MAGIC * **Step 2:** Load data into DeltaLake
 # MAGIC * **Step 3:** Create silver tables using Snowplow's DBT package
 # MAGIC * **Step 4:** Perform exploratory data analysis using Databricks SQL
 # MAGIC * **Step 5:** Create gold table for audience segmentation
@@ -81,6 +81,12 @@
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC 
+# MAGIC ###  What makes Snowplow Data GDPR Compliant? 
+
+# COMMAND ----------
+
 # DBTITLE 1,What makes Snowplow Data GDPR Compliant? 
 # MAGIC %md
 # MAGIC 
@@ -113,6 +119,11 @@
 # MAGIC - **Marketing campaign**, source, medium, 
 # MAGIC - **Device information** (browser, language, type, OS version, family, JS, timezone, screen resolution...)
 # MAGIC - **Behavioural metrics** (engaged time, total time, vertical scroll percentage)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Richness of the data in one single schema table
 
 # COMMAND ----------
 
@@ -243,7 +254,7 @@ df.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable("snowpl
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Step 5: Use Hightouch for rule-based remarketing
+# MAGIC ## Step 6: Use Hightouch for rule-based remarketing
 
 # COMMAND ----------
 
@@ -256,7 +267,7 @@ df.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable("snowpl
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Step 6: Train propensity to convert model using XGBoost and MLflow
+# MAGIC ## Step 7: Train propensity to convert model using XGBoost and MLflow
 
 # COMMAND ----------
 
@@ -347,24 +358,6 @@ with mlflow.start_run(run_name='XGBClassifier') as run:
 
 # COMMAND ----------
 
-# DBTITLE 1,Feature importance for the model performance
-We can see the importance of the engagement metrics in predicting conversion. 
-
-The presence of user behavioural metrics like 
- - Vertical Scrolling (on the pages)
- - Engaged time (on the pages)
- - Absolute time (spent on the website) 
- 
- support the model performance from 40%
-
-
-
-
-plot_importance(model)
-pyplot.show()
-
-# COMMAND ----------
-
 # DBTITLE 1,Save our new model to the registry as a version
 model_registered = mlflow.register_model("runs:/"+run_id+"/model", "field_demos_ccdp")
 
@@ -378,7 +371,7 @@ client.transition_model_version_stage(name = "field_demos_ccdp", version = model
 # COMMAND ----------
 
 # MAGIC %md-sandbox
-# MAGIC ## Step 7: Use model to predict propensity to convert
+# MAGIC ## Step 8: Use model to predict propensity to convert
 # MAGIC 
 # MAGIC Now that our model is built and saved in MLFlow registry, we can load it to run our inferences at scale.
 
@@ -410,6 +403,24 @@ display(predictions.groupBy('propensity_prediction').count())
 
 # COMMAND ----------
 
+# DBTITLE 1,Feature importance for the model performance
+We can see the importance of the engagement metrics in predicting conversion. 
+
+The presence of user behavioural metrics like 
+ - Vertical Scrolling (on the pages)
+ - Engaged time (on the pages)
+ - Absolute time (spent on the website) 
+ 
+ support the model performance from 40%
+
+
+
+
+plot_importance(model)
+pyplot.show()
+
+# COMMAND ----------
+
 # DBTITLE 1,Save high propensity to convert website visitors
 high_propensity_web_users = predictions.select('domain_userid', 'propensity_prediction').where(predictions.propensity_prediction == 1)
 high_propensity_web_users.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable("snowplow_samples.samples.high_propensity_web_users") 
@@ -417,7 +428,7 @@ high_propensity_web_users.write.mode("overwrite").option("overwriteSchema", "tru
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Step 8: Use Hightouch for ML-based remarketing
+# MAGIC ## Step 9: Use Hightouch for ML-based remarketing
 
 # COMMAND ----------
 
@@ -429,7 +440,7 @@ high_propensity_web_users.write.mode("overwrite").option("overwriteSchema", "tru
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Step 9: Compare campaign performance: ML vs. Rule Based
+# MAGIC ## Step 10: Compare campaign performance: ML vs. Rule Based
 
 # COMMAND ----------
 
