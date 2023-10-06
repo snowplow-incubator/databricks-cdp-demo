@@ -4,53 +4,67 @@
 
 # COMMAND ----------
 
+# DBTITLE 1,Datasets Available for Download
+# MAGIC %md
+# MAGIC ### Raw Events Sample
+# MAGIC Atomic Events Table -> https://snowplow-demo-datasets.s3.eu-central-1.amazonaws.com/Web_Analytics/Web_Analytics_sample_events.csv
+# MAGIC
+# MAGIC ### Post dbt Modeling
+# MAGIC Snowplow Web Page Table -> https://snowplow-demo-datasets.s3.eu-central-1.amazonaws.com/cCDP/snowplow_web_page_views.csv
+# MAGIC
+# MAGIC Snowplow Web Sessions Table ->https://snowplow-demo-datasets.s3.eu-central-1.amazonaws.com/cCDP/snowplow_web_sessions.csv
+# MAGIC
+# MAGIC Snowplow Web Users Table -> https://snowplow-demo-datasets.s3.eu-central-1.amazonaws.com/cCDP/snowplow_web_users.csv
+
+# COMMAND ----------
+
+# DBTITLE 1,Composable CDP
+# MAGIC %md
+# MAGIC We will leverage a **Composable CDP** built with Snowplow, Databricks, and Reverse ETL of your choice to achieve our goal of converting website visitors into engaged prospects by remarketing to them through various marketing channels.
+# MAGIC
+# MAGIC The components of standard CDP offerings can be classified into the following categories:
+# MAGIC
+# MAGIC
+# MAGIC - **Data Collection** : CDPs are designed to collect customer events from a number of different sources (onsite, mobile applications and server-side) and append these activities to the customer profile. These events typically contain metadata to provide detailed context about the customer's specific digital interactions. Event collection is typically designed to support marketing use cases such as marketing automation.
+# MAGIC
+# MAGIC - **Data Storage and Modeling**: CDPs provide a proprietary repository of data that aggregates and manages different sources of customer data collected from most of the business's SaaS and internal applications. The unified database is a 360 degree view about each customer and a central source of truth for the business. Most CDPs have out-of-the-box identity stitching functionality and tools to create custom traits on user profiles.
+# MAGIC
+# MAGIC - **Data Activation**: CDPs offer the ability to build audience segments leveraging the data available in the platform. Thanks to a wide-array of pre-built integrations, these audiences and other customer data points are then able to be pushed both to and from various marketing channels.
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/composable_cdp.png" width="60%">
+# MAGIC
+# MAGIC
+# MAGIC **Full article:** https://www.databricks.com/blog/2022/06/24/the-emergence-of-the-composable-customer-data-platform.html
+
+# COMMAND ----------
+
 # DBTITLE 1,Composable CDP Demo Overview
 # MAGIC %md
 # MAGIC * **Background:** Data practitioners across the globe visit Snowplow's website to learn how the leader in data creation helps organizations create and maintain high quality and privacy-compliant first party data. While some of these visitors request a demo instantly, others remain in the awareness stage of the marketing funnel for some time.
 # MAGIC   * **Business Objective:** Convert prospects from awareness to engaged users (request for demo).
 # MAGIC   * **Marketing Strategy:** Focus remarketing efforts on prospects with highest propensity to convert.
 # MAGIC   * **Audience Segmentation:** Rules-based audience segment and ML-based audience segment
-# MAGIC 
+# MAGIC
 # MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/ad_campaign_dashboard.png" width="70%" style="float:right"/>
-# MAGIC 
+# MAGIC
 # MAGIC [Link to Dashboard](https://dbc-dcab5385-51e3.cloud.databricks.com/sql/dashboards/3c27e852-ca5e-40fc-a701-f8c5e580ad19?o=2894723222787945)
 # MAGIC   
 
 # COMMAND ----------
 
-# DBTITLE 1,Composable CDP
-# MAGIC %md
-# MAGIC We will leverage a **Composable CDP** built with Snowplow, Databricks, and Hightouch to achieve our goal of converting website visitors into engaged prospects by remarketing to them through various marketing channels.
-# MAGIC 
-# MAGIC The components of standard CDP offerings can be classified into the following categories:
-# MAGIC 
-# MAGIC 
-# MAGIC - **Data Collection** : CDPs are designed to collect customer events from a number of different sources (onsite, mobile applications and server-side) and append these activities to the customer profile. These events typically contain metadata to provide detailed context about the customer's specific digital interactions. Event collection is typically designed to support marketing use cases such as marketing automation.
-# MAGIC 
-# MAGIC - **Data Storage and Modeling**: CDPs provide a proprietary repository of data that aggregates and manages different sources of customer data collected from most of the business's SaaS and internal applications. The unified database is a 360 degree view about each customer and a central source of truth for the business. Most CDPs have out-of-the-box identity stitching functionality and tools to create custom traits on user profiles.
-# MAGIC 
-# MAGIC - **Data Activation**: CDPs offer the ability to build audience segments leveraging the data available in the platform. Thanks to a wide-array of pre-built integrations, these audiences and other customer data points are then able to be pushed both to and from various marketing channels.
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/composable_cdp.png" width="60%">
-# MAGIC 
-# MAGIC 
-# MAGIC **Full article:** https://www.databricks.com/blog/2022/06/24/the-emergence-of-the-composable-customer-data-platform.html
-
-# COMMAND ----------
-
 # DBTITLE 1,Composable CDP: Demo Workflow
 # MAGIC %md
-# MAGIC 
-# MAGIC <img src="https://cme-solution-accelerators-images.s3.us-west-2.amazonaws.com/composable-cdp/workflow2.png" width="80%" style="float: right" />
-# MAGIC 
+# MAGIC
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/composable_cdp_workflow.png" width="80%" style="float: right" />
+# MAGIC
 # MAGIC * **Step 1:** Create  compliant behavioural data using Snowplow
 # MAGIC * **Step 2:** Load data into DeltaLake
 # MAGIC * **Step 3:** Create silver tables using Snowplow's DBT package
 # MAGIC * **Step 4:** Perform exploratory data analysis using Databricks SQL
 # MAGIC * **Step 5:** Create gold table for audience segmentation
-# MAGIC * **Step 6:** Use Hightouch for rules-based remarketing
+# MAGIC * **Step 6:** Use Reverse ETL for rules-based remarketing
 # MAGIC * **Step 7:** Train propensity to convert model using XGBoost and Mlflow
 # MAGIC * **Step 8:** Use model to predict propensity to convert
-# MAGIC * **Step 9:** Use Hightouch for ML-based remarketing
+# MAGIC * **Step 9:** Use Reverse ETL for ML-based remarketing
 # MAGIC * **Step 10:** Monitor campaign performance
 
 # COMMAND ----------
@@ -61,36 +75,37 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC 
+# MAGIC
 # MAGIC Snowplow is an open-source enterprise data creation platform that enables data collection from multiple products for advanced data analytics and AI/ML solutions. 
-# MAGIC 
+# MAGIC
 # MAGIC **Snowplow allows you to:** 
-# MAGIC 
+# MAGIC
 # MAGIC - Create a rich granular behavioural data across your digital platform
 # MAGIC - Define your own version-controlled custom events and entity schema
 # MAGIC - Enchrich the data with various services (pseudonymization, geo, currency exchange, campaign attribution...)
 # MAGIC - Provides flexible identity stitching
 # MAGIC - Control the quality of your data
 # MAGIC - Own your data asset and infrastructure
-# MAGIC 
+# MAGIC
 # MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_BDP.png" width="60%">
-# MAGIC 
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
+# MAGIC
 # MAGIC [Setting up the JavaScript tracker for web](https://docs.snowplow.io/docs/collecting-data/collecting-from-own-applications/javascript-trackers/javascript-tracker/web-quick-start-guide/) | [All available enchrichments](https://docs.snowplow.io/docs/enriching-your-data/available-enrichments/)
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC 
+# MAGIC
 # MAGIC ###  What makes Snowplow Data GDPR Compliant? 
+# MAGIC
 
 # COMMAND ----------
 
 # DBTITLE 1,What makes Snowplow Data GDPR Compliant? 
 # MAGIC %md
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/Snowplow_gdpr.png" width="900%" style="float: center"/>
 
 # COMMAND ----------
@@ -102,14 +117,14 @@
 
 # MAGIC %md
 # MAGIC Once your tracking is set up, all events are loaded in real-time using Snowplow's RDB loader into a single atomic events table backed by Databricks’ Delta tables. We call this a “Wide-row Table” – with one row per event, and one column for each type of entity/property and self-describing event.
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_pipeline2.png" width="60%" style="float: left"/>
-# MAGIC 
+# MAGIC
 # MAGIC **In the single schema table you get:**
-# MAGIC 
+# MAGIC
 # MAGIC <br>
-# MAGIC 
+# MAGIC
 # MAGIC - **All events from multiple sources** (web, app, mobile, server)
 # MAGIC - **Pseudonymised IP address**
 # MAGIC - **Consent information** (granted, withdrawn), consent basis, GDPR context (privacy policy, expiry date, description, URL)
@@ -134,48 +149,48 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Step 3: Create silver tables using Snowplow's DBT package
+# MAGIC ## Step 3: Create silver tables using Snowplow's dbt package
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC Snowplow's out-of-the-box dbt models aggregate the data to different levels of altitude, so data scientists can directly consume the right altitude for their model. For composable CDP use cases, we're typically making predictions at the user-level. However, it is valuable to be able to drill down into the session, page view and event level, to understand where the user is in their journey and how that is changing over time.
-# MAGIC 
+# MAGIC
 # MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/snowplow_web_model_dag.png" width="30%">
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC ### The dbt package will:
-# MAGIC 
+# MAGIC
 # MAGIC - Transforms and aggregates raw web event data collected from the Snowplow JavaScript tracker into a set of derived tables: page views, sessions and users.
 # MAGIC - Derives a mapping between user identifiers, allowing for 'session stitching' and the development of a single customer view.
 # MAGIC - Processes all web events incrementally. It is not just constrained to page view events - any custom events you are tracking will also be incrementally processed.
 # MAGIC - Is designed in a modular manner, allowing you to easily integrate your own custom SQL into the incremental framework provided by the package.
-# MAGIC 
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
+# MAGIC
 # MAGIC ### Steps to proceed:
-# MAGIC 
+# MAGIC
 # MAGIC **2.1. Use dbt Cloud using Partner Connect**
 # MAGIC Easily setup yout dbt Cloud connection using Databricks' [Partner Connect](https://dbc-dcab5385-51e3.cloud.databricks.com/partnerconnect?o=2894723222787945).
-# MAGIC 
+# MAGIC
 # MAGIC **2.2. Install the snowplow_web dbt package**
 # MAGIC To include the package in your dbt project, include the following in your `packages.yml` file:
-# MAGIC 
+# MAGIC
 # MAGIC ```yaml
 # MAGIC packages:
 # MAGIC   - package: snowplow/snowplow_web
 # MAGIC     version: [">=0.9.0", "<0.10.0"]
 # MAGIC ```
-# MAGIC 
+# MAGIC
 # MAGIC Run `dbt deps` to install the package.
-# MAGIC 
+# MAGIC
 # MAGIC [Snowplow dbt packages](https://hub.getdbt.com/snowplow/) | [Using dbt with Databricks (if not via Partner Connect)](https://github.com/databricks/dbt-databricks)
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ### What does the modelled data actually look like?
-# MAGIC 
+# MAGIC
 # MAGIC Below is a view of a single user shown through our users, sessions and page views derived tables:
 
 # COMMAND ----------
@@ -213,7 +228,7 @@
 
 # MAGIC %md
 # MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/dashboard_screenshot_1.png" width="70%">
-# MAGIC 
+# MAGIC
 # MAGIC [Snowplow Website Insights](https://dbc-dcab5385-51e3.cloud.databricks.com/sql/dashboards/d98ec601-48c1-4f28-a06e-b8c75e118147-snowplow-website-insights?o=2894723222787945) 
 
 # COMMAND ----------
@@ -231,8 +246,8 @@
 # MAGIC     device_family, os_family, row_number() OVER (PARTITION BY domain_userid ORDER BY start_tstamp) AS rn
 # MAGIC     FROM snowplow_samples.dbt_cloud_derived.snowplow_web_page_views
 # MAGIC     WHERE page_view_in_session_index = 1 qualify rn = 1)
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC   SELECT u.domain_userid, u.first_page_title, u.refr_urlhost, lower(u.refr_medium) as refr_medium,
 # MAGIC   lower(u.mkt_medium) as mkt_medium, u.mkt_source, u.mkt_term, u.mkt_campaign, u.engaged_time_in_s, 
 # MAGIC   u.sessions, u.page_views, pv.absolute_time_in_s, pv.vertical_percentage_scrolled, pv.geo_country,
@@ -254,15 +269,15 @@ df.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable("snowpl
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Step 6: Use Hightouch for rule-based remarketing
+# MAGIC ## Step 6: Use Reverse ETL for rule-based remarketing
 
 # COMMAND ----------
 
 # DBTITLE 1,Three steps to audience segmentation
 # MAGIC %md
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_rules-based.png" width="80%">
-# MAGIC 
-# MAGIC [Partner Connect](https://dbc-dcab5385-51e3.cloud.databricks.com/partnerconnect?o=2894723222787945) | [Hightouch Audiences](https://app.hightouch.com/snowplow-yzw4c/audiences) | [Hightouch Destinations](https://app.hightouch.com/snowplow-yzw4c/destinations)
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/step_6_retl.png" width="100%">
+# MAGIC
+# MAGIC [Census Audiences](https://docs.getcensus.com/basics/audience-hub) | [Census Destinations](https://docs.getcensus.com/destinations/overview)
 
 # COMMAND ----------
 
@@ -372,7 +387,7 @@ client.transition_model_version_stage(name = "field_demos_ccdp", version = model
 
 # MAGIC %md-sandbox
 # MAGIC ## Step 8: Use model to predict propensity to convert
-# MAGIC 
+# MAGIC
 # MAGIC Now that our model is built and saved in MLFlow registry, we can load it to run our inferences at scale.
 
 # COMMAND ----------
@@ -383,7 +398,6 @@ client.transition_model_version_stage(name = "field_demos_ccdp", version = model
 #                           |            |
 model_path = 'models:/field_demos_ccdp/Production'
 predict_propensity = mlflow.pyfunc.spark_udf(spark, model_path, result_type='double')
-
 
 # COMMAND ----------
 
@@ -428,14 +442,14 @@ high_propensity_web_users.write.mode("overwrite").option("overwriteSchema", "tru
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Step 9: Use Hightouch for ML-based remarketing
+# MAGIC ## Step 9: Use Reverse ETL for ML-based remarketing
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/hightouch_ml-based.png" width="60%">
-# MAGIC 
-# MAGIC [Hightouch Audiences](https://app.hightouch.com/snowplow-yzw4c/audiences) | [Hightouch Destinations](https://app.hightouch.com/snowplow-yzw4c/destinations)
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/step_9_retl.png" width="100%">
+# MAGIC
+# MAGIC [Census Audiences](https://docs.getcensus.com/basics/audience-hub) | [Census Destinations](https://docs.getcensus.com/destinations/overview)
 
 # COMMAND ----------
 
@@ -452,6 +466,6 @@ high_propensity_web_users.write.mode("overwrite").option("overwriteSchema", "tru
 
 # DBTITLE 1,Monitor campaign performance
 # MAGIC %md
-# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/ad_campaign_dashboard_hightouch.png" width="70%" style="float:right"/>
-# MAGIC 
+# MAGIC <img src="https://raw.githubusercontent.com/snowplow-incubator/databricks-cdp-demo/main/assets/ad_campaign_dashboard_retl.png" width="70%" style="float:right"/>
+# MAGIC
 # MAGIC [Link to Dashboard](https://dbc-dcab5385-51e3.cloud.databricks.com/sql/dashboards/3c27e852-ca5e-40fc-a701-f8c5e580ad19?o=2894723222787945)
